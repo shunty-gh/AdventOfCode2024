@@ -2,6 +2,8 @@
 
 namespace Shunty.AoC.Days;
 
+// https://adventofcode.com/2024/day/1 - Historian Hysteria
+
 public class Day01 : AocDaySolver
 {
     public int DayNumber => 1;
@@ -22,19 +24,13 @@ public class Day01 : AocDaySolver
         this.ShowDayHeader();
         this.ShowDayResult(1, part1);
 
+        // Part 2
         // "Calculate a total similarity score by adding up each number in the left
         // list after multiplying it by the number of times that number appears in the right list."
         var left2 = left1.GroupBy(x => x).ToImmutableDictionary(x => x.Key, x => x.Count());
         var right2 = right1.GroupBy(x => x).ToImmutableDictionary(x => x.Key, x => x.Count());
 
-        var part2 = 0L;
-        foreach (var (key, value) in left2)
-        {
-            if (right2.ContainsKey(key))
-            {
-                part2 += key * value * right2[key];
-            }
-        }
+        var part2 = left2.Sum(x => right2.ContainsKey(x.Key) ? x.Key * x.Value * right2[x.Key] : 0);
         this.ShowDayResult(2, part2);
     }
 }
