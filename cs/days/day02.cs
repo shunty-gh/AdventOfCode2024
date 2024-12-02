@@ -2,51 +2,65 @@ using System.Collections.Immutable;
 
 namespace Shunty.AoC.Days;
 
-// https://adventofcode.com/2024/day/2 -
+// https://adventofcode.com/2024/day/2 - Red-Nosed Reports
 
 public class Day02 : AocDaySolver
 {
     public int DayNumber => 2;
 
-    private enum LevelDiff
-    {
-        None,
-        Increase,
-        Decrease,
-        Fail,
-    }
-
     public async Task Solve()
     {
         var lines = (await File.ReadAllLinesAsync(AocUtils.FindInputFile(DayNumber)))
+        //var lines = TestInput.Trim().Split('\n')
             .Select(x => x.Split(' '))
             .Select(x => x.Select(y => int.Parse(y)).ToImmutableList())
             .ToImmutableList();
 
-        var part1 = lines.Sum(x => ComparePart1(x));
-            this.ShowDayResult(1, part1);
-    }
+        var part1 = lines.Sum(x => TestLine(x));
+        this.ShowDayResult(1, part1);
 
-    private int ComparePart1(IReadOnlyList<int> nums)
-    {
-        Func<int, int, LevelDiff, LevelDiff>  compPart1 = (x, y, ld) =>
+        var part2 = 0;
+        foreach (var line in lines)
         {
-            if (x == y) return LevelDiff.Fail;
-            if (x < y && y - x <= 3) return ld == LevelDiff.None || ld == LevelDiff.Increase ? LevelDiff.Increase : LevelDiff.Fail;
-            if (x > y && x - y <= 3) return ld == LevelDiff.None || ld == LevelDiff.Decrease ? LevelDiff.Decrease : LevelDiff.Fail;
-            return LevelDiff.Fail;
-        };
-
-        var result = compPart1(nums[0], nums[1], LevelDiff.None);
-        if (result == LevelDiff.Fail)
-            return 0;
-
-        for (var i = 1; i < nums.Count - 1; i++)
-        {
-            var diff = compPart1(nums[i], nums[i+1], result);
-            if (diff == LevelDiff.Fail)
-                return 0;
+            for (var idx = -1; idx <= line.Count - 1; idx++)
+            {
+                var ln = line.ToList();
+                if (idx >= 0)
+                    ln.RemoveAt(idx);
+                var res = TestLine(ln);
+                if (res == 1)
+                {
+                    part2 += 1;
+                    break;
+                }
+            }
         }
-        return 1;
+        this.ShowDayResult(2, part2);
     }
+
+    private int TestLine(IReadOnlyList<int> nums)
+    {
+        // Are they ordered up or down
+        var inc = nums.Zip(nums.Skip(1), (x, y) => new { x, y }).All(z => z.x < z.y);
+        var dec = nums.Zip(nums.Skip(1), (x, y) => new { x, y }).All(z => z.x > z.y);
+        // If so, then are they not too far apart
+        if (inc || dec)
+        {
+            for (var i = 0; i < nums.Count - 1; i++)
+            {
+                if (Math.Abs(nums[i] - nums[i+1]) > 3)
+                    return 0;
+            }
+        }
+        return inc || dec ? 1 : 0;
+    }
+
+    private const string TestInput = """
+    7 6 4 2 1
+    1 2 7 8 9
+    9 7 6 2 1
+    1 3 2 4 5
+    8 6 4 4 1
+    1 3 6 7 9
+    """;
 }

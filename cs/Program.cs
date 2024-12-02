@@ -2,4 +2,5 @@
 global using Shunty.AoC.Days;
 
 AocUtils.PrintTitle("Advent of Code 2024 (C#)");
-await new Day01().Solve();
+//await new Day01().Solve();
+await new Day02().Solve();
