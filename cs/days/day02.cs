@@ -24,6 +24,8 @@ public class Day02 : AocDaySolver
         {
             for (var idx = -1; idx <= line.Count - 1; idx++)
             {
+                // Make a copy of the line, take out one element at a time
+                // (except for the first run) and re-test
                 var ln = line.ToList();
                 if (idx >= 0)
                     ln.RemoveAt(idx);
@@ -41,8 +43,8 @@ public class Day02 : AocDaySolver
     private int TestLine(IReadOnlyList<int> nums)
     {
         // Are they ordered up or down
-        var inc = nums.Zip(nums.Skip(1), (x, y) => new { x, y }).All(z => z.x < z.y);
-        var dec = nums.Zip(nums.Skip(1), (x, y) => new { x, y }).All(z => z.x > z.y);
+        var inc = nums.Zip(nums.Skip(1), (x, y) => (x, y)).All(z => z.x < z.y);
+        var dec = nums.Zip(nums.Skip(1), (x, y) => (x, y)).All(z => z.x > z.y);
         // If so, then are they not too far apart
         if (inc || dec)
         {
@@ -55,6 +57,7 @@ public class Day02 : AocDaySolver
         return inc || dec ? 1 : 0;
     }
 
+    //Test data, expect P1 = 2, P2 = 4
     private const string TestInput = """
     7 6 4 2 1
     1 2 7 8 9
