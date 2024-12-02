@@ -1,5 +1,3 @@
-import os
-
 def test_line(line):
     # Are they all up or all down
     inc = all(x < y for (x,y) in zip(line, line[1:]))  # or, perhaps: line == sorted(line)
@@ -20,6 +18,7 @@ print("Part 1:", sum(1 for line in lines if test_line(line)))
 
 part2 = 0
 for line in lines:
+    # Remove each element in turn and re-test the line
     for i in range(len(line)):
         #ln = line.copy()
         #del(ln[i])
