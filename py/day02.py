@@ -1,12 +1,7 @@
 def test_line(line):
-    # Are they all up or all down
-    inc = all(x < y for (x,y) in zip(line, line[1:]))  # or, perhaps: line == sorted(line)
-    dec = all(x > y for (x,y) in zip(line, line[1:]))  #              line == sorted(line, reverse=True)
-    # If so, are they close enough together
-    if inc or dec:
-        for i in range(len(line) - 1):
-            if abs(line[i] - line[i+1]) > 3:
-                return False
+    # Are they all up or all down and close enough
+    inc = all(x < y and y - x <= 3 for (x,y) in zip(line, line[1:]))
+    dec = all(x > y and x - y <= 3 for (x,y) in zip(line, line[1:]))
     return inc or dec
 
 
@@ -20,9 +15,7 @@ part2 = 0
 for line in lines:
     # Remove each element in turn and re-test the line
     for i in range(len(line)):
-        #ln = line.copy()
-        #del(ln[i])
-        ln = line[:i] + line[i+1:]
+        ln = line[:i] + line[i+1:]  # or 'ln = line.copy()' ; 'del(ln[i])'
         if test_line(ln):
             part2 += 1
             break
