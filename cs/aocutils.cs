@@ -4,6 +4,8 @@ namespace Shunty.AoC;
 
 public static class AocUtils
 {
+    public const int AoCYear = 2024;
+
     /// <summary>
     /// Output the given title text to the console in random ANSI
     /// colouring (if the shell supports it)
@@ -23,7 +25,7 @@ public static class AocUtils
     /// <summary>
     /// Try and find the input file for the given day.
     /// Search in the current directory, then in a './input/
-    /// sub-directory i(f one exists) and then repeat in each
+    /// sub-directory (if one exists) and then repeat in each
     /// parent directory tree for a few levels until we find
     /// an appropriate input file. If we reach the max number
     /// of levels then return an empty string.
@@ -76,11 +78,37 @@ public static class AocUtils
         return "";
     }
 
+    /// <summary>
+    /// Parse the command line args for any day numbers required
+    /// </summary>
+    public static List<int> GetDaysRequested(string[] args)
+    {
+        var today = DateTime.Today;
+        var curentDay = (today.Year == AoCYear && today.Month == 12 && today.Day <= 25) ? today.Day : 0;
+        var runAll = args.Any(a => a == "-a" || a == "--all");
+        if (runAll)
+            return [];
+
+        // Get any day numbers off the command line
+        var daysRequested = args
+            .Select(a => int.TryParse(a, out var ia) ? ia : 0)
+            .Where(i => i > 0 && i <= 25)
+            .OrderBy(x => x)
+            .Distinct()
+            .ToList();
+        // Just today if we haven't specified anything else
+        if (daysRequested.Count == 0 && curentDay > 0)
+        {
+            daysRequested.Add(curentDay);
+        }
+        return daysRequested;
+    }
 }
 
 public interface AocDaySolver
 {
     int DayNumber { get; }
+    string Title { get; }
     Task Solve();
 }
 
@@ -92,7 +120,7 @@ public static class AocDaySolverExtensions
 
     public static void ShowDayHeader(this AocDaySolver solver)
     {
-        AnsiConsole.MarkupLine($"[bold]Day {solver.DayNumber}[/]");
+        AnsiConsole.MarkupLine($"[bold]Day {solver.DayNumber}[/] - {solver.Title} (https://adventofcode.com/{AocUtils.AoCYear}/day/{solver.DayNumber})");
     }
 
     public static void ShowDayResult<T>(this AocDaySolver _, int part, T solution, string suffix = "")

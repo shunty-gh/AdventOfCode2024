@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 
 namespace Shunty.AoC.Days;
 
@@ -7,6 +6,7 @@ namespace Shunty.AoC.Days;
 public class Day02 : AocDaySolver
 {
     public int DayNumber => 2;
+    public string Title => "Red-Nosed Reports";
 
     public async Task Solve()
     {

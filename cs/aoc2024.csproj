@@ -14,4 +14,13 @@
     <PackageReference Include="Spectre.Console" Version="0.48.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Using Include="System.Collections.Frozen" />
+    <Using Include="System.Collections.Immutable" />
+
+    <Using Include="Spectre.Console;" />
+
+    <Using Include="Shunty.AoC" />
+    <Using Include="Shunty.AoC.Days" />
+  </ItemGroup>
 </Project>

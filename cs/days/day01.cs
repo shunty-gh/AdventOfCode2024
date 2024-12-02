@@ -1,5 +1,4 @@
-﻿using System.Collections.Immutable;
-
+﻿
 namespace Shunty.AoC.Days;
 
 // https://adventofcode.com/2024/day/1 - Historian Hysteria
@@ -7,6 +6,7 @@ namespace Shunty.AoC.Days;
 public class Day01 : AocDaySolver
 {
     public int DayNumber => 1;
+    public string Title => "Historian Hysteria";
 
     public async Task Solve()
     {
@@ -21,7 +21,6 @@ public class Day01 : AocDaySolver
 
         var part1 = left1.Zip(right1, (x, y) => Math.Abs(x - y)).Sum();
 
-        this.ShowDayHeader();
         this.ShowDayResult(1, part1);
 
         // Part 2
