@@ -49,4 +49,4 @@ dotnet publish -c Release
 This will produce a much faster, platform native executable. By default it will be output to the `<repo>/cs/bin/Release/net9.0/<platform>/publish/` directory.
 eg `./bin/Release/net9.0/win-x64/publish/aoc2024.exe` on Windows and `./bin/Release/net9.0/linux-x64/publish/aoc2024` on Linux.
 
-Run this compiled exectuable with the same parameters as listed in the `Run` section, above
+Run this compiled exectuable with the same parameters as listed in the [Run](#run) section, above
