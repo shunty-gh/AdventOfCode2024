@@ -42,18 +42,9 @@ public class Day02 : AocDaySolver
 
     private int TestLine(IReadOnlyList<int> nums)
     {
-        // Are they ordered up or down
-        var inc = nums.Zip(nums.Skip(1), (x, y) => (x, y)).All(z => z.x < z.y);
-        var dec = nums.Zip(nums.Skip(1), (x, y) => (x, y)).All(z => z.x > z.y);
-        // If so, then are they not too far apart
-        if (inc || dec)
-        {
-            for (var i = 0; i < nums.Count - 1; i++)
-            {
-                if (Math.Abs(nums[i] - nums[i+1]) > 3)
-                    return 0;
-            }
-        }
+        // Are they ordered up or down and close enough
+        var inc = nums.Zip(nums.Skip(1), (x, y) => (x, y)).All(z => z.x < z.y && z.y - z.x <= 3);
+        var dec = nums.Zip(nums.Skip(1), (x, y) => (x, y)).All(z => z.x > z.y && z.x - z.y <= 3);
         return inc || dec ? 1 : 0;
     }
 
