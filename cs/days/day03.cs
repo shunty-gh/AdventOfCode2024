@@ -1,4 +1,3 @@
-
 using System.Text.RegularExpressions;
 
 namespace Shunty.AoC.Days;
@@ -21,20 +20,15 @@ public class Day03 : AocDaySolver
     public async Task Solve()
     {
         var input = string.Join("", await File.ReadAllLinesAsync(AocUtils.FindInputFile(DayNumber)));
-        var matchesP1 = reP1.Matches(input);
 
-        var part1 = 0L;
-        foreach (var m in matchesP1.ToList())
-        {
-            var mm = reInner.Matches(m.Value).ToList();
-            part1 += int.Parse(mm[0].Groups[1].Value) * int.Parse(mm[0].Groups[2].Value);
-        }
+        var matchesP1 = reP1.Matches(input);
+        var part1 = matchesP1.Sum(GetMulValue);
         this.ShowDayResult(1, part1);
 
         var ok = true;
         var part2 = 0L;
         var matchesP2 = reP2.Matches(input);
-        foreach (var m in matchesP2.ToList())
+        foreach (Match m in matchesP2)
         {
             if (m.Value == "don't()")
             {
@@ -46,10 +40,15 @@ public class Day03 : AocDaySolver
             }
             else if (ok)
             {
-                var mm = reInner.Matches(m.Value).ToList();
-                part2 += int.Parse(mm[0].Groups[1].Value) * int.Parse(mm[0].Groups[2].Value);
+                part2 += GetMulValue(m);
             }
         }
         this.ShowDayResult(2, part2);
+    }
+
+    private int GetMulValue(Match match)
+    {
+        var mm = reInner.Matches(match.Value);
+        return int.Parse(mm[0].Groups[1].Value) * int.Parse(mm[0].Groups[2].Value);
     }
 }
