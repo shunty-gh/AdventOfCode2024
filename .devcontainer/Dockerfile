@@ -7,7 +7,7 @@ FROM mcr.microsoft.com/devcontainers/dotnet:9.0
 ENV DEBIAN_FRONTEND=noninteractive
 
 COPY ./bash_aliases /root/.bash_aliases
-COPY ./bash_aliases $HOME/.bash_aliases
+COPY ./bash_aliases /home/vscode/.bash_aliases
 
 # Install dependencies & useful tools
 RUN apt update && apt install -y --no-install-recommends \
