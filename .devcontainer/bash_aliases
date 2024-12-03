@@ -1,0 +1,12 @@
+alias py="python3 "
+alias ll='ls -alF --color=auto'
+
+alias ..="cd .."
+alias ...="cd ../.."
+alias -- -="cd -"
+
+alias _="sudo "
+alias fd="fdfind "
+
+alias gs="git status "
+alias gsb="git status -sb"
