@@ -1,0 +1,23 @@
+{
+    "configurations": [
+        {
+            "name": "AoC C#",
+            "type": "dotnet",
+            "projectPath": "cs/aoc2024.csproj",
+            "args": [],
+        },
+        {
+            "name": "AoC Rust",
+            "type": "cargo",
+            "workingDir": "rs/",
+            "cargoArgs": [],
+        },
+        {
+            "name": "AoC Python",
+            "type": "python",
+            "workingDir": "py/",
+            "arguments": [],
+            "file": "$FILE$"
+        },
+    ]
+}
