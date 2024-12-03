@@ -1,4 +1,5 @@
 use std::fmt::Display;
+use std::fs;
 use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
@@ -37,6 +38,13 @@ pub fn find_input_file(day_no: &i32) -> Option<String> {
         dir = format!("{}/..", dir);
         level += 1;
     }
+}
+
+/// Read all text from a file into a `String`. Remove all CR/LF.
+pub fn get_text_from_file(filename: &str) -> io::Result<String> {
+    let content = fs::read_to_string(filename)?;
+    let result = content.replace(['\n', '\r'], "");
+    Ok(result)
 }
 
 /// Read all text from a file into a `Vec<String>`

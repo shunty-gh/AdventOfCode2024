@@ -13,4 +13,8 @@ fn main() {
     println!("Day 2");
     days::day02::run();
     println!();
+
+    println!("Day 3");
+    days::day03::run();
+    println!();
 }
