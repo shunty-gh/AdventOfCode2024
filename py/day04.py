@@ -13,11 +13,10 @@ def find_x_mas(x, y, grid):
 with open(f'../input/day04-input', 'r') as file:
     lines = [line.strip() for line in file.readlines()]
 
-part1, part2 = 0, 0
-for yy,line in enumerate(lines):
-    for xx in range(0, len(line)):
-        part1 += find_mas(xx, yy, lines)
-        part2 += find_x_mas(xx, yy, lines)
+linelen, part1, part2 = len(lines[0]), 0, 0
+for xx, yy in [(xx,yy) for xx in range(0, linelen) for yy in range(0, len(lines))]:
+    part1 += find_mas(xx, yy, lines)
+    part2 += find_x_mas(xx, yy, lines)
 
 print("Part 1:", part1)
 print("Part 2:", part2)
