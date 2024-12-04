@@ -12,7 +12,7 @@ public class Day04 : AocDaySolver
         var input = (await File.ReadAllLinesAsync(AocUtils.FindInputFile(DayNumber))).ToImmutableList();
         //var input = TestData.Split('\n').ToList();
 
-        var part1 = 0;
+        int part1 = 0, part2 = 0;
         for (int y = 0; y < input.Count; y++)
         {
             var row = input[y];
@@ -20,32 +20,22 @@ public class Day04 : AocDaySolver
             {
                 if ('X' == row[x])
                 {
-                    // Find MAS
                     var mas = FindMAS(x, y, input);
                     part1 += mas;
                 }
-            }
-        }
-        this.ShowDayResult(1, part1);
-
-        var part2 = 0;
-        for (int y = 0; y < input.Count; y++)
-        {
-            var row = input[y];
-            for (int x = 0; x < row.Length; x++)
-            {
-                if ('A' == row[x])
+                else if ('A' == row[x])
                 {
                     if (FindX_MAS(x, y, input))
                         part2 += 1;
                 }
             }
         }
+        this.ShowDayResult(1, part1);
         this.ShowDayResult(2, part2);
     }
 
-    private (int dx, int dy)[] Directions = [(0,-1), (1,-1), (1,0), (1,1), (0,1), (-1,1), (-1,0), (-1,-1)];
-    private int FindMAS(int X, int Y, IReadOnlyList<string> source)
+    private static readonly (int dx, int dy)[] Directions = [(0,-1), (1,-1), (1,0), (1,1), (0,1), (-1,1), (-1,0), (-1,-1)];
+    private static int FindMAS(int X, int Y, IReadOnlyList<string> source)
     {
         var result = 0;
         foreach (var (dx, dy) in Directions)
@@ -62,7 +52,7 @@ public class Day04 : AocDaySolver
         return result;
     }
 
-    private bool FindX_MAS(int X,int Y, IReadOnlyList<string> source)
+    private static bool FindX_MAS(int X, int Y, IReadOnlyList<string> source)
     {
         // pt is an 'A'. We need to find M and S in both diagonals
         // ie ((above-left == S && below-right == M) || (above-left == M && below-right == S))
