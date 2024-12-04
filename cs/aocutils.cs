@@ -1,3 +1,4 @@
+using System.Security.Cryptography.X509Certificates;
 using Spectre.Console;
 
 namespace Shunty.AoC;
@@ -103,6 +104,22 @@ public static class AocUtils
         }
         return daysRequested;
     }
+
+    // Grid and map type helpers
+    
+    /// <summary>
+    /// From index Y in the source list, return the character at index position X.
+    /// If X or Y is out of bounds return the `notFound` character rather than throwing an exception.
+    /// </summary>
+    public static char CharAt(this IReadOnlyList<string> source, (int X, int Y) pt, char notFound = ' ') => 
+        CharAt(source, pt.X, pt.Y, notFound);
+
+    /// <summary>
+    /// From the string at index Y in the source list, return the character at index position X.
+    /// If X or Y is out of bounds return the `notFound` character rather than throwing an exception.
+    /// </summary>
+    public static char CharAt(this IReadOnlyList<string> source, int X, int Y, char notFound = ' ') => 
+        (X >= 0 && X < source[0].Length && Y >= 0 && Y < source.Count) ? source[Y][X] : notFound;
 }
 
 public interface AocDaySolver
