@@ -40,6 +40,12 @@ pub fn find_input_file(day_no: &i32) -> Option<String> {
     }
 }
 
+/// Read all text from a file into a `String`. Leave all CR/LF in place.
+pub fn get_raw_text_from_file(filename: &str) -> io::Result<String> {
+    let content = fs::read_to_string(filename)?;
+    Ok(content)
+}
+
 /// Read all text from a file into a `String`. Remove all CR/LF.
 pub fn get_text_from_file(filename: &str) -> io::Result<String> {
     let content = fs::read_to_string(filename)?;
