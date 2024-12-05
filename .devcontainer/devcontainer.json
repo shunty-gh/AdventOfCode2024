@@ -22,7 +22,9 @@
         "vscode": {
             "extensions": [
 				 "mutantdino.resourcemonitor"
+                ,"ms-dotnettools.csdevkit"
                 ,"vscode-icons-team.vscode-icons"
+                ,"phil294.git-log--graph"
             ],
             "settings": {
                 "terminal.integrated.shell.linux": "/bin/bash"
