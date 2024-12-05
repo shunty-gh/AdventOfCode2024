@@ -19,29 +19,18 @@ pub fn run() {
     let (mut part1, mut part2) = (0, 0);
     for line in runlines.lines() {
         let nums: Vec<i32> = line.split(",").map(|s| s.parse::<i32>().unwrap()).collect();
-        let mut ok = true;
-        for i in 0..nums.len()-1 {
-            let (x, y) = (nums[i], nums[i+1]);
-            if !rules[&x].contains(&y) {
-                ok = false;
-                break;
-            }
-        }
-        let mid = ((nums.len() - 1) / 2) as usize;
+        let ok = nums.is_sorted_by(|a,b| rules[a].contains(b));
+
+        let mid = (nums.len() - 1) / 2;
         if ok {
             part1 += nums[mid];
         } else {
             let mut fixed = nums.clone();
-            fixed.sort_by(|&a,&b| {
-                if rules[&a].contains(&b) {
-                    return std::cmp::Ordering::Greater;
-                }
-                return std::cmp::Ordering::Less;
-            });
+            fixed.sort_unstable_by(|a,b| rules[a].contains(b).cmp(&true));
             part2 += fixed[mid];
         }
     }
 
-    print_day_result(&1, &part1);
-    print_day_result(&2, &part2);
+    print_day_result(&1, part1);
+    print_day_result(&2, part2);
 }
