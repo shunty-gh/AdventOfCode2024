@@ -22,7 +22,7 @@ pub fn run() {
     print_day_result(&2, part2);
 }
 
-fn find_mas(x: &usize, y: &usize, grid: &Vec<Vec<char>>) -> i32 {
+fn find_mas(x: &usize, y: &usize, grid: &[Vec<char>]) -> i32 {
     let mut result = 0;
     let dirs = vec![(0, -1), (1, -1), (1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1)];
     for (dx,dy) in dirs {
@@ -40,25 +40,25 @@ fn find_mas(x: &usize, y: &usize, grid: &Vec<Vec<char>>) -> i32 {
             }
         }
     }
-    return result;
+    result
 }
 
-fn char_at(x: &i32, y: &i32, grid: &Vec<Vec<char>>) -> char {
+fn char_at(x: &i32, y: &i32, grid: &[Vec<char>]) -> char {
     if *x < 0 || *x >= grid[0].len() as i32 || *y < 0 || *y >= grid.len() as i32 {
         return ' ';
     }
-    return grid[*y as usize][*x as usize];
+    grid[*y as usize][*x as usize]
 }
 
-fn find_x_mas(x: &usize, y: &usize, grid: &Vec<Vec<char>>) -> i32 {
-    let upl = char_at(&(*x as i32 - 1), &(*y as i32 - 1), &grid);
-    let upr = char_at(&(*x as i32 + 1), &(*y as i32 - 1), &grid);
-    let dnl = char_at(&(*x as i32 - 1), &(*y as i32 + 1), &grid);
-    let dnr = char_at(&(*x as i32 + 1), &(*y as i32 + 1), &grid);
+fn find_x_mas(x: &usize, y: &usize, grid: &[Vec<char>]) -> i32 {
+    let upl = char_at(&(*x as i32 - 1), &(*y as i32 - 1), grid);
+    let upr = char_at(&(*x as i32 + 1), &(*y as i32 - 1), grid);
+    let dnl = char_at(&(*x as i32 - 1), &(*y as i32 + 1), grid);
+    let dnr = char_at(&(*x as i32 + 1), &(*y as i32 + 1), grid);
 
     if (upl == 'M' && dnr == 'S' || upl == 'S' && dnr == 'M')
     && (upr == 'M' && dnl == 'S' || upr == 'S' && dnl == 'M') {
         return 1;
     }
-    return 0;
+    0
 }

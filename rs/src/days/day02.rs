@@ -8,7 +8,7 @@ pub fn run() {
     let mut part1 = 0;
     let mut part2 = 0;
     nums.iter().for_each(|row| {
-        if test_row(&row) {
+        if test_row(row) {
             part1 += 1;
             part2 += 1;
         } else {
@@ -22,15 +22,15 @@ pub fn run() {
             }
         }
     });
-    print_day_result(&1, &part1);
-    print_day_result(&2, &part2);
+    print_day_result(&1, part1);
+    print_day_result(&2, part2);
 
 }
 
-fn test_row(row: &Vec<i32>) -> bool {
+fn test_row(row: &[i32]) -> bool {
     let inc = row.iter().zip(row.iter().skip(1))
         .all(|(x,y)| y > x && y - x <= 3);
     let dec = row.iter().zip(row.iter().skip(1))
         .all(|(x,y)| x > y && x - y <= 3);
-    return inc || dec;
+    inc || dec
 }

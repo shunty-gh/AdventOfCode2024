@@ -16,7 +16,7 @@ pub fn run() {
         }).collect();
 
     let part1: i32 = caps.iter().map(|c| c.0 * c.1).sum();
-    print_day_result(&1, &part1);
+    print_day_result(&1, part1);
 
     let pattern2 = r"mul\(\d+,\d+\)|do\(\)|don\'t\(\)";
     let re2 = Regex::new(pattern2).expect("Bad regex");
@@ -30,11 +30,12 @@ pub fn run() {
         } else if m == &"don't()" {
             ok = false;
         } else if ok {
-            re1.captures(&m).map(|c| {
+            let caps = re1.captures(m);
+            if let Some(c) = caps {
                 let (_, [x, y]) = c.extract();
                 part2 += x.parse::<i32>().unwrap() * y.parse::<i32>().unwrap();
-            });
+            }
         }
     }
-    print_day_result(&2, &part2);
+    print_day_result(&2, part2);
 }

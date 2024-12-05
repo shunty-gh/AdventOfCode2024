@@ -31,7 +31,7 @@ pub fn run() {
     left.sort();
     right.sort();
     let part1: i32 = left.iter().zip(right.iter()).map(|(x,y)| (x - y).abs() ).sum();
-    print_day_result(&1,&part1);
+    print_day_result(&1,part1);
 
     let right2 = right.iter().collect::<Counter<_>>();
     let mut part2 = 0;
@@ -41,5 +41,5 @@ pub fn run() {
             part2 += x * rc as i32;
         }
     });
-    print_day_result(&2, &part2);
+    print_day_result(&2, part2);
 }
