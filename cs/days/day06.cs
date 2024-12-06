@@ -2,6 +2,8 @@ namespace Shunty.AoC.Days;
 
 // https://adventofcode.com/2024/day/6 - Guard Gallivant
 
+// Runs much faster when compiled in release mode. But still takes a few seconds.
+
 public class Day06 : AocDaySolver
 {
     private record Point(int X, int Y);
@@ -27,11 +29,9 @@ public class Day06 : AocDaySolver
         // Re-run the route while trying an obstacle at each possible position
         for (var y = 0; y < input.Count; y++)
             for (var x = 0; x < input[y].Length; x++)
-                if (input[y][x] == '.')
+                if (input[y][x] == '.' && RunRoute(input, start, new Point(x, y)) < 0)
                 {
-                    var loop = RunRoute(input, start, new Point(x, y));
-                    if (loop < 0)
-                        part2 += 1;
+                    part2 += 1;
                 }
 
         this.ShowDayResult(2, part2);
@@ -43,39 +43,21 @@ public class Day06 : AocDaySolver
     /// <returns>The number of unique locations visited before exiting the area or -1 if we end up in a loop</returns>
     private int RunRoute(IReadOnlyList<string> map, Point start, Point? obstacle = null)
     {
-        const char OOB = ' '; // the character we'll use to indicate out of bounds
         var current = start;
         var direction = new Point(0, -1);
         HashSet<Point> visited1 = new([start]);
         HashSet<(Point, Point)> visited2 = new([(start, direction)]);
 
         obstacle ??= new Point(-1, -1);
-        var p1 = obstacle.X < 0;
-        var p2 = !p1;
+        var p2 = obstacle.X >= 0;
         while (true)
         {
             var next = new Point(current.X + direction.X, current.Y + direction.Y);
-            var ch = map.CharAt(next.X, next.Y, OOB);
-            if (ch == '#' || next == obstacle)
-            {
-                // and then a step to the right
-                direction = new(-direction.Y, direction.X);
-                next = new(current.X + direction.X, current.Y + direction.Y);
-                ch = map.CharAt(next.X, next.Y, OOB);
-                if (ch == '#' || next == obstacle)
-                {
-                    // Turn right again
-                    // We won't need more than two right turns because the second turn will have
-                    // us walking back to our previous location - which we know must be ok
-                    direction = new(-direction.Y, direction.X);
-                    next = new(current.X + direction.X, current.Y + direction.Y);
-                    ch = map.CharAt(next.X, next.Y, OOB);
-                }
-            }
-            if (ch == OOB)
+
+            if (next.X < 0 || next.Y < 0 || next.Y >= map.Count || next.X >= map[0].Length)
             {
                 // Elvis (she/they) is leaving the area
-                break;
+                return visited1.Count;
             }
 
             if (p2 && visited2.Contains((next, direction)))
@@ -83,12 +65,18 @@ public class Day06 : AocDaySolver
                 // We've been here, going in this direction, already. Therefore it's a loop.
                 return -1;
             }
-            // else
-            if (p1) visited1.Add(next);
-            if (p2) visited2.Add((next, direction));
-            current = new(next.X, next.Y);
+
+            if (map[next.Y][next.X] == '#' || next == obstacle)
+            {
+                direction = new(-direction.Y, direction.X);
+            }
+            else
+            {
+                if (!p2) visited1.Add(next);
+                if (p2) visited2.Add((next, direction));
+                current = new(next.X, next.Y);
+            }
         }
-        return p1 ? visited1.Count : visited2.Count;
     }
 
     // Test data, expect P1 = 41; P2 = 6
