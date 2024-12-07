@@ -12,7 +12,6 @@ public class Day07 : AocDaySolver
         var input = (await File.ReadAllLinesAsync(AocUtils.FindInputFile(DayNumber))).ToImmutableList();
         //var input = TestInput.Split('\n').ToList();
 
-
         long part1 = 0, part2 = 0;
         foreach (var line in input)
         {
@@ -26,29 +25,28 @@ public class Day07 : AocDaySolver
         this.ShowDayResult(2, part2);
     }
 
-    private long CheckEquation(long target, IReadOnlyList<long> nums, bool p2 = false)
+    private static long CheckEquation(long target, IReadOnlyList<long> nums, bool p2 = false)
     {
-        Queue<List<long>> q = new();
-        q.Enqueue([.. nums]);
+        var nlen = nums.Count;
+        Queue<(long, int)> q = new();
+        q.Enqueue((nums[0], 1));
         while (q.Count > 0)
         {
-            var tocheck = q.Dequeue();
-            if (tocheck.Count == 1)
+            var (acc, idx) = q.Dequeue();
+            var next = nums[idx];
+            var nplus = acc + next;
+            var nmult = acc * next;
+            var nconc = p2 ? long.Parse(acc.ToString() + next.ToString()) : 0;
+
+            if (idx + 1 == nlen)
             {
-                if (tocheck[0] == target)
+                if (nplus == target || nmult == target || nconc == target)
                     return target;
                 continue;
             }
-
-            q.Enqueue([tocheck[0] + tocheck[1], .. tocheck[2..]]);
-            q.Enqueue([tocheck[0] * tocheck[1], .. tocheck[2..]]);
-
-            if (p2)
-            {
-                // Concat the first two numbers
-                var nn = long.Parse(tocheck[0].ToString() + tocheck[1].ToString());
-                q.Enqueue([nn, .. tocheck[2..]]);
-            }
+            if (nplus <= target) q.Enqueue((nplus, idx + 1));
+            if (nmult <= target) q.Enqueue((nmult, idx + 1));
+            if (p2 && nconc <= target) q.Enqueue((nconc, idx + 1));
         }
         return 0; // No solution found
     }
