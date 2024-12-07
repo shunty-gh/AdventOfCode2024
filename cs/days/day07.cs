@@ -1,37 +1,35 @@
-using System.Globalization;
-
 namespace Shunty.AoC.Days;
 
-// https://adventofcode.com/2024/day/7 -
+// https://adventofcode.com/2024/day/7 - Bridge Repair
 
 public class Day07 : AocDaySolver
 {
     public int DayNumber => 7;
-    public string Title => "";
+    public string Title => "Bridge Repair";
 
     public async Task Solve()
     {
         var input = (await File.ReadAllLinesAsync(AocUtils.FindInputFile(DayNumber))).ToImmutableList();
-        //var input = (await File.ReadAllTextAsync(AocUtils.FindInputFile(DayNumber))).Split("\n\n");
         //var input = TestInput.Split('\n').ToList();
 
 
-        Int64 part1 = 0, part2 = 0;
+        long part1 = 0, part2 = 0;
         foreach (var line in input)
         {
             var sp = line.Split(":");
-            var target = Int64.Parse(sp[0].Trim());
-            var nums = sp[1].Trim().Split(" ").Select(Int64.Parse).ToList();
+            var target = long.Parse(sp[0].Trim());
+            var nums = sp[1].Trim().Split(" ").Select(long.Parse).ToList();
             part1 += CheckEquation(target, nums);
+            part2 += CheckEquation(target, nums, true);
         }
         this.ShowDayResult(1, part1);
         this.ShowDayResult(2, part2);
     }
 
-    private Int64 CheckEquation(Int64 target, IReadOnlyList<Int64> nums)
+    private long CheckEquation(long target, IReadOnlyList<long> nums, bool p2 = false)
     {
-        Queue<List<Int64>> q = new();
-        q.Enqueue(nums.ToList());
+        Queue<List<long>> q = new();
+        q.Enqueue([.. nums]);
         while (q.Count > 0)
         {
             var tocheck = q.Dequeue();
@@ -42,17 +40,17 @@ public class Day07 : AocDaySolver
                 continue;
             }
 
-            var nplus = tocheck[0] + tocheck[1];
-            List<Int64> nxP = new([nplus]);
-            nxP.AddRange(tocheck[2..]);
-            q.Enqueue(nxP);
+            q.Enqueue([tocheck[0] + tocheck[1], .. tocheck[2..]]);
+            q.Enqueue([tocheck[0] * tocheck[1], .. tocheck[2..]]);
 
-            var ntimes = tocheck[0] * tocheck[1];
-            List<Int64> nxT = new([ntimes]);
-            nxT.AddRange(tocheck[2..]);
-            q.Enqueue(nxT);
+            if (p2)
+            {
+                // Concat the first two numbers
+                var nn = long.Parse(tocheck[0].ToString() + tocheck[1].ToString());
+                q.Enqueue([nn, .. tocheck[2..]]);
+            }
         }
-        return 0;
+        return 0; // No solution found
     }
 
     private const string TestInput = """
