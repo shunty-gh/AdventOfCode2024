@@ -11,11 +11,11 @@ def walkroute(grid, sX, sY, oX, oY):
 
         # Part1 - guard has left the area
         if not (0 <= nX < xlen and 0 <= nY < ylen):
-            return len(visited)
+            return len(visited), visited
 
         # Have we found a loop - ie we've seen this location AND this direction before
         if p2 and (nX, nY, dX, dY) in visited:
-            return -1
+            return -1, []
 
         # Hit an obstacle? Turn right.
         if input[nY][nX] == '#' or (oX, oY) == (nX, nY):
@@ -38,13 +38,16 @@ for y in range(ylen):
             break
     if startX >= 0: break
 
-part1 = walkroute(input, startX, startY, -1, -1)
+part1, p1visited = walkroute(input, startX, startY, -1, -1)
 print("Part 1:", part1)
 
 part2 = 0
 for oby in range(ylen):
     for obx in range(xlen):
-        if input[oby][obx] == '.':
-            part2 += 1 if walkroute(input, startX, startY, obx, oby) < 0 else 0
+        # Only try obstacles at points that the original route visted. If the point wasn't
+        # in the original route then an obstacle at that point won't make any difference
+        if input[oby][obx] == '.' and (obx, oby) in p1visited:
+            p2, _ = walkroute(input, startX, startY, obx, oby)
+            if p2 < 0: part2 += 1
 
 print("Part 2:", part2)

@@ -22,16 +22,19 @@ public class Day06 : AocDaySolver
                 if (input[y][x] == '^')
                     start = new(x, y);
 
-        var part1 = RunRoute(input, start);
+        var (part1, p1visited) = RunRoute(input, start);
         this.ShowDayResult(1, part1);
 
         int part2 = 0;
-        // Re-run the route while trying an obstacle at each possible position
+        // Re-run the route with an obstacle included
         for (var y = 0; y < input.Count; y++)
             for (var x = 0; x < input[y].Length; x++)
-                if (input[y][x] == '.' && RunRoute(input, start, new Point(x, y)) < 0)
+                // Only try obstacles at points that the original route visted. If the point wasn't
+                // in the original route then an obstacle at that point won't make any difference
+                if (input[y][x] == '.' && p1visited.Contains(new Point(x, y)))
                 {
-                    part2 += 1;
+                    var (p2, _) = RunRoute(input, start, new Point(x, y));
+                    part2 += p2 < 0 ? 1 : 0;
                 }
 
         this.ShowDayResult(2, part2);
@@ -41,7 +44,7 @@ public class Day06 : AocDaySolver
     /// Run through the guards route with an optional extra obstacle at a given point (for part 2).
     /// </summary>
     /// <returns>The number of unique locations visited before exiting the area or -1 if we end up in a loop</returns>
-    private int RunRoute(IReadOnlyList<string> map, Point start, Point? obstacle = null)
+    private (int, HashSet<Point>) RunRoute(IReadOnlyList<string> map, Point start, Point? obstacle = null)
     {
         var current = start;
         var direction = new Point(0, -1);
@@ -57,13 +60,13 @@ public class Day06 : AocDaySolver
             if (next.X < 0 || next.Y < 0 || next.Y >= map.Count || next.X >= map[0].Length)
             {
                 // Elvis (she/they) is leaving the area
-                return visited1.Count;
+                return (visited1.Count, visited1);
             }
 
             if (p2 && visited2.Contains((next, direction)))
             {
                 // We've been here, going in this direction, already. Therefore it's a loop.
-                return -1;
+                return (-1, []);
             }
 
             if (map[next.Y][next.X] == '#' || next == obstacle)
