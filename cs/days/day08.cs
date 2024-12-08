@@ -1,11 +1,11 @@
 namespace Shunty.AoC.Days;
 
-// https://adventofcode.com/2024/day/8 -
+// https://adventofcode.com/2024/day/8 - Resonant Collinearity
 
 public class Day08 : AocDaySolver
 {
     public int DayNumber => 8;
-    public string Title => "";
+    public string Title => "Resonant Collinearity";
 
     public async Task Solve()
     {
@@ -23,29 +23,54 @@ public class Day08 : AocDaySolver
                         antennas[k] = [];
                     antennas[k].Add(v);
                 }
-        int part1 = 0, part2 = 0;
-        HashSet<(int x, int y)> antinodes = new();
+
         var xlen = input[0].Length;
         var ylen = input.Count;
-        foreach (var (k,v) in antennas)
+        Func<int,int,bool> inGrid = (x,y) => x >= 0 && x < xlen && y >= 0 && y < ylen;
+
+        HashSet<(int x, int y)> antinodesP1 = [];
+        HashSet<(int x, int y)> antinodesP2 = [];
+        foreach (var ant in antennas.Values)
         {
-            for (var i = 0; i < v.Count; i++)
-                for (var j = i+1; j < v.Count; j++)
+            for (var i = 0; i < ant.Count-1; i++) // Pair them up
+                for (var j = i+1; j < ant.Count; j++)
                 {
-                    var (ax,ay) = v[i];
-                    var (bx,by) = v[j];
+                    var (ax,ay) = ant[i];
+                    var (bx,by) = ant[j];
                     var (dx, dy) = (ax - bx, ay - by);
-                    var (ant1x, ant1y) = (ax + dx, ay + dy);
-                    var (ant2x, ant2y) = (bx - dx, by - dy);
-                    if (ant1x >= 0 && ant1x < xlen && ant1y >= 0 && ant1y < ylen)
-                        antinodes.Add((ant1x, ant1y));
-                    if (ant2x >= 0 && ant2x < xlen && ant2y >= 0 && ant2y < ylen)
-                        antinodes.Add((ant2x, ant2y));
+
+                    var mul = 1;
+                    bool okH = true, okL = true;
+                    while (okH || okL) // Keep going until both + and - distances are out of range
+                    {
+                        // Add antenna at multiples of dx,dy
+                        var (antHx, antHy) = (ax + mul * dx, ay + mul * dy);
+                        var (antLx, antLy) = (bx - mul * dx, by - mul * dy);
+
+                        // Are they still in range?
+                        if (!inGrid(antHx, antHy))
+                            okH = false;
+                        if (!inGrid(antLx, antLy))
+                            okL = false;
+
+                        if (mul == 1) // Part 1
+                        {
+                            if (okH) antinodesP1.Add((antHx, antHy));
+                            if (okL) antinodesP1.Add((antLx, antLy));
+                        }
+
+                        if (okH) antinodesP2.Add((antHx, antHy));
+                        if (okL) antinodesP2.Add((antLx, antLy));
+
+                        mul += 1;
+                    }
+                    // Add each antenna for part 2
+                    antinodesP2.Add((ax, ay));
+                    antinodesP2.Add((bx, by));
                 }
         }
-        part1 = antinodes.Count;
-        this.ShowDayResult(1, part1);
-        this.ShowDayResult(2, part2);
+        this.ShowDayResult(1, antinodesP1.Count);
+        this.ShowDayResult(2, antinodesP2.Count);
     }
 
     private const string TestInput = """
