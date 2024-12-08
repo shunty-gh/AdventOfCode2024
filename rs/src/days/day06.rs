@@ -27,22 +27,25 @@ pub fn run() {
     }
 
     // Part 1
-    let part1 = do_patrol(&grid, start_x, start_y, -1, -1);
+    let (part1, p1visited) = do_patrol(&grid, start_x, start_y, -1, -1);
     print_day_result(&1, part1);
 
     // Part 2 - try to patrol with an obstacle at each possible location
     let mut part2 = 0;
     for (y, v) in grid.iter().enumerate() {
         for (x, c) in v.iter().enumerate() {
-            if *c == '.' && do_patrol(&grid, start_x, start_y, x as i32, y as i32) < 0 {
-                part2 += 1;
+            if *c == '.' && p1visited.contains(&(x as i32, y as i32)) {
+                let (p2, _) = do_patrol(&grid, start_x, start_y, x as i32, y as i32);
+                if p2 < 0 {
+                    part2 += 1;
+                }
             }
         }
     }
     print_day_result(&2, part2);
 }
 
-fn do_patrol(grid: &[Vec<char>], sx: i32, sy: i32, ox: i32, oy: i32) -> i32 {
+fn do_patrol(grid: &[Vec<char>], sx: i32, sy: i32, ox: i32, oy: i32) -> (i32,HashSet<(i32,i32)>) {
     // sx,sy -> start position; cx,cy -> current position; ox,oy -> obstacle position
     // nx,ny -> next position; dx,dy -> direction
     let p2 = ox > 0;
@@ -60,13 +63,13 @@ fn do_patrol(grid: &[Vec<char>], sx: i32, sy: i32, ox: i32, oy: i32) -> i32 {
 
         // Are we wandering out of the area (part 1)
         if nx < 0 || nx >= xlen || ny < 0 || ny >= ylen {
-            return seen1.len() as i32;
+            return (seen1.len() as i32, seen1);
         }
 
         // If we've been here before AND going in the same direction, then
         // we've found a loop (part 2)
         if p2 && seen2.contains(&(nx, ny, dx, dy)) {
-            return -1;
+            return (-1, HashSet::new());
         }
 
          // Have we hit an obstacle? Turn right.
