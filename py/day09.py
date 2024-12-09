@@ -4,73 +4,71 @@ input = open(f'../input/day09-input', 'r').read().strip()
 def part1():
     fs = []
     for i in range(0, len(input), 2):
-        id = i // 2
-        flen = int(input[i])
-        slen = int(input[i+1]) if i+1 < len(input) else 0
-
-        for fl in range(flen):
-            fs.append(id)
-        for sl in range(slen):
-            fs.append(' ')
+        for fl in range(int(input[i])):
+            fs.append(i // 2)
+        for sl in range(int(input[i+1]) if i+1 < len(input) else 0):
+            fs.append(None)
 
     sp = 0
     ep = len(fs)-1
     while sp < ep:
-        while fs[sp] != ' ':
+        while fs[sp] is not None:
             sp += 1
 
-        while fs[ep] == ' ':
+        while fs[ep] is None:
             ep -= 1
 
         if sp < ep:
             fs[sp] = fs[ep]
-            fs[ep] = ' '
+            fs[ep] = None
 
         sp += 1
         ep -= 1
 
-    result = 0
-    for i,c in enumerate(fs):
-        if c != ' ':
-            result += i * c
-    return result
+    return sum(i * (c or 0) for i,c in enumerate(fs))
 
 def part2():
     fs = []
     for i in range(0, len(input), 2):
-        id = i // 2
-        flen = int(input[i])
-        slen = int(input[i+1]) if i+1 < len(input) else 0
+        fs.append((i // 2, int(input[i])))
+        fs.append((None, int(input[i+1]) if i+1 < len(input) else 0))
 
-        fs.append((id, flen))
-        fs.append((' ', slen))
-
+    first_free = 1
     ep = len(fs) - 1
     while ep > 1:
-        mv_val, mv_len = fs[ep]
-        if mv_val == ' ':
+        mv_id, mv_len = fs[ep]
+        if mv_id is None:
             ep -= 1
             continue
 
-        for i in range(1, ep):
+        ff = 0
+        for i in range(first_free, ep):
             v,l = fs[i]
-            if v == ' ' and l >= mv_len:
-                fs.insert(i, (mv_val, mv_len))
-                fs[i+1] = (' ', l - mv_len)
+            if v is None and ff<= 0:
+                ff = i
+            if v is None and l >= mv_len:
+                fs.insert(i, (mv_id, mv_len))
+                # shrink the free space after the moved file
+                fs[i+1] = (None, l - mv_len)
 
-                # Consolidate free space
-                if fs[ep][0] == ' ' and ep+2 < len(fs) and fs[ep+2][0] == ' ':
-                    fs[ep] = (' ', fs[ep][1] + fs[ep+2][1] + mv_len)
+                # Consolidate free space where the file used to be
+                freespace = (None, mv_len)
+                # check for free space immediately after the file we're moving
+                if ep+2 < len(fs) and fs[ep+2][0] is None:
+                    freespace = (None, fs[ep+2][1] + mv_len)
                     del fs[ep+2]
+
+                # check for free space immediately before the file we're moving
+                if fs[ep][0] is None:
+                    fs[ep] = (None, fs[ep][1] + freespace[1])
                     del fs[ep+1]
-                elif fs[ep][0] == ' ':
-                    fs[ep] = (' ', (fs[ep][1] + mv_len))
-                    del fs[ep+1]
-                elif ep+2 < len(fs) and fs[ep+2][0] == ' ':
-                    fs[ep+2] = (' ', fs[ep+2][1] + mv_len)
-                    del fs[ep+1]
-                else:
-                    fs[ep] = (' ', mv_len)
+                else: # otherwise, just mark this block as free
+                    fs[ep+1] = freespace
+
+                # delete the free space entry after the moved file if it is 0 length
+                if i+1 < ep and l - mv_len == 0:
+                    del fs[i+1]
+                    first_free = ff
 
                 break
 
@@ -80,8 +78,7 @@ def part2():
     result = 0
     for c, n in fs:
         for i in range(n):
-            if c != ' ':
-                result += idx * c
+            result += idx * (c or 0)
             idx += 1
     return result
 
