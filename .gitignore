@@ -17,6 +17,9 @@ py/__pycache__/
 *.private.*
 .env
 
+# Don't check in input files https://adventofcode.com/about#faq_copying
+/input/
+
 # Allow 'fetch' tools
 !fetch-aoc-data
 !fetch-aoc-data.exe
