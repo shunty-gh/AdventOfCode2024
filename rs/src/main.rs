@@ -34,7 +34,11 @@ fn main() {
     // days::day06::run();
     // println!();
 
-    println!("Day 10");
-    days::day10::run();
+    // println!("Day 10");
+    // days::day10::run();
+    // println!();
+
+    println!("Day 11");
+    days::day11::run();
     println!();
 }
