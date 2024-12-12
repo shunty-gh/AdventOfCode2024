@@ -106,21 +106,38 @@ public static class AocUtils
     }
 
     // Grid and map type helpers
-    
+
     /// <summary>
     /// From index Y in the source list, return the character at index position X.
     /// If X or Y is out of bounds return the `notFound` character rather than throwing an exception.
     /// </summary>
-    public static char CharAt(this IReadOnlyList<string> source, (int X, int Y) pt, char notFound = ' ') => 
+    public static char CharAt(this IReadOnlyList<string> source, (int X, int Y) pt, char notFound = ' ') =>
         CharAt(source, pt.X, pt.Y, notFound);
 
     /// <summary>
     /// From the string at index Y in the source list, return the character at index position X.
     /// If X or Y is out of bounds return the `notFound` character rather than throwing an exception.
     /// </summary>
-    public static char CharAt(this IReadOnlyList<string> source, int X, int Y, char notFound = ' ') => 
+    public static char CharAt(this IReadOnlyList<string> source, int X, int Y, char notFound = ' ') =>
         (X >= 0 && X < source[0].Length && Y >= 0 && Y < source.Count) ? source[Y][X] : notFound;
+
+    /// <summary>
+    /// From the string at index point.Y in the source list, return the character at index position point.X.
+    /// If X or Y is out of bounds return the `notFound` character rather than throwing an exception.
+    /// </summary>
+    public static char CharAt(this IReadOnlyList<string> source, Point2d point, char notFound = ' ') =>
+        (point.X >= 0 && point.X < source[0].Length && point.Y >= 0 && point.Y < source.Count) ? source[point.Y][point.X] : notFound;
+
 }
+
+public record Point2d(int X, int Y)
+{
+    public static readonly List<Point2d> NS = [new(0,-1), new(0,1)];
+    public static readonly List<Point2d> NESW = [new(0,-1), new(1,0), new(0,1), new(-1,0)];
+    public static readonly List<Point2d> Diagonals = [new(1,-1), new(1,1), new(-1,1), new(-1,-1)];
+}
+
+public record Point3d(int X, int Y, int Z);
 
 public interface AocDaySolver
 {
