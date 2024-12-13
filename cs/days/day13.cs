@@ -4,7 +4,7 @@ namespace Shunty.AoC.Days;
 
 // https://adventofcode.com/2024/day/13 - Claw Contraption
 
-public class Day13 : AocDaySolver
+public partial class Day13 : AocDaySolver
 {
     private record Button(int X, int Y);
     private record Prize(long X, long Y);
@@ -107,11 +107,16 @@ public class Day13 : AocDaySolver
 
     private const string ButtonPattern = @"Button [AB]: X\+(?<xinc>\d+), Y\+(?<yinc>\d+)";
     private const string PrizePattern = @"Prize: X=(?<xprize>\d+), Y=(?<yprize>\d+)";
-    private static readonly Regex ButtonRe = new Regex(ButtonPattern);
-    private static readonly Regex PrizeRe = new Regex(PrizePattern);
+
+    [GeneratedRegex(ButtonPattern)]
+    private static partial Regex ButtonRe();
+
+    [GeneratedRegex(PrizePattern)]
+    private static partial Regex PrizeRe();
+
     private static Button ReadButtonLine(string line)
     {
-        var match = ButtonRe.Match(line);
+        var match = ButtonRe().Match(line);
         var x = int.Parse(match.Groups["xinc"].Value);
         var y = int.Parse(match.Groups["yinc"].Value);
         return new Button(x, y);
@@ -119,7 +124,7 @@ public class Day13 : AocDaySolver
 
     private static Prize ReadPrizeLine(string line)
     {
-        var match = PrizeRe.Match(line);
+        var match = PrizeRe().Match(line);
         var x = int.Parse(match.Groups["xprize"].Value);
         var y = int.Parse(match.Groups["yprize"].Value);
         return new Prize(x, y);
