@@ -83,7 +83,7 @@ public partial class Day14 : AocDaySolver
             var state = Move(robots, i);
             if (await MightItBeATree(state, i, printit))
             {
-                // Also we'll assume (from limited testing) that the first possible hit is actually the only possible one222233333333333333333333333333333333333333333333333333333333
+                // Also we'll assume (from limited testing) that the first possible hit is actually the only possible one
                 return i;
             }
         }
