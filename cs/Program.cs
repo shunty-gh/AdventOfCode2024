@@ -12,12 +12,12 @@
 * ***
 */
 
-
 if (args.Contains("-h") || args.Contains("--help") || args.Contains("--?"))
 {
     ShowHelp();
     return;
 }
+var nostatus = args.Contains("--no-status") || args.Contains("-ns");
 
 var daySolutions = new Dictionary<int, Func<AocDaySolver>>()
 {
@@ -34,7 +34,7 @@ var daySolutions = new Dictionary<int, Func<AocDaySolver>>()
     { 11, () => new Day11() },
     { 12, () => new Day12() },
     { 13, () => new Day13() },
-    // { 14, () => new Day14() },
+    { 14, () => new Day14() },
     // { 15, () => new Day15() },
     // { 16, () => new Day16() },
     // { 17, () => new Day17() },
@@ -62,36 +62,49 @@ if (days.Count == 0)
 }
 
 var sw = new System.Diagnostics.Stopwatch();
-await AnsiConsole.Status()
-    .StartAsync($"Running solution{(days.Count == 1 ? "" : "s")}...", async ctx =>
+sw.Start();
+if (nostatus)
+{
+    foreach (var day in days)
     {
-        sw.Start();
-        var flipflop = false;
-        ctx.Spinner(Spinner.Known.Christmas);
-
-        foreach (var day in days)
+        await Solve(day);
+    }
+}
+else
+{
+    await AnsiConsole.Status()
+        .StartAsync($"Running solution{(days.Count == 1 ? "" : "s")}...", async ctx =>
         {
-            var start = sw.ElapsedMilliseconds;
-            if (!daySolutions.ContainsKey(day))
+            var flipflop = false;
+            ctx.Spinner(Spinner.Known.Christmas);
+
+            foreach (var day in days)
             {
-                Console.WriteLine($"No solution for day {day}");
-                Console.WriteLine();
-                Console.WriteLine();
-                Console.WriteLine();
-                continue;
+                ctx.Spinner(flipflop ? Spinner.Known.Star : Spinner.Known.Christmas);
+                flipflop = !flipflop;
+                //await Task.Delay(1000);  // Optional - So we get time to see the christmassy spinners :-)
+
+                await Solve(day);
             }
+        });
+}
 
-            ctx.Spinner(flipflop ? Spinner.Known.Star : Spinner.Known.Christmas);
-            flipflop = !flipflop;
-            //await Task.Delay(1000);  // Optional - So we get time to see the christmassy spinners :-)
-
-            var solver = daySolutions[day]();
-            solver.ShowDayHeader();
-            await solver.Solve();
-            AnsiConsole.MarkupLine($"  [blue]Day {solver.DayNumber} completed in [yellow]{sw.ElapsedMilliseconds - start}[/]ms[/]");
-            Console.WriteLine();
-        }
-    });
+async Task Solve(int day)
+{
+    if (!daySolutions.ContainsKey(day))
+    {
+        Console.WriteLine($"No solution for day {day}");
+        Console.WriteLine();
+        Console.WriteLine();
+        return;
+    }
+    var solver = daySolutions[day]();
+    var start = sw.ElapsedMilliseconds;
+    solver.ShowDayHeader();
+    await solver.Solve();
+    AnsiConsole.MarkupLine($"  [blue]Day {solver.DayNumber} completed in [yellow]{sw.ElapsedMilliseconds - start}[/]ms[/]");
+    Console.WriteLine();
+}
 
 static void ShowHelp()
 {

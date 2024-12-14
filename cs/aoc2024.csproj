@@ -22,6 +22,7 @@
   <ItemGroup>
     <Using Include="System.Collections.Frozen" />
     <Using Include="System.Collections.Immutable" />
+    <Using Include="System.Text" />
 
     <Using Include="Spectre.Console;" />
 
