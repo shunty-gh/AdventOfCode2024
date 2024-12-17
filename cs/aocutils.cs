@@ -1,5 +1,4 @@
-using System.Security.Cryptography.X509Certificates;
-using Spectre.Console;
+using System.Numerics;
 
 namespace Shunty.AoC;
 
@@ -172,5 +171,36 @@ public static class AocDaySolverExtensions
     {
         AnsiConsole.MarkupLine($"  [bold]Part 1:[/] {solution1?.ToString() ?? "<Unknown>"}");
         AnsiConsole.MarkupLine($"  [bold]Part 2:[/] {solution2?.ToString() ?? "<Unknown>"}");
+    }
+}
+
+public static class NumericExtensions
+{
+    public static (int StartIndex, int SequenceLength) FindRepeatingSequence<T>(this List<T> source, int minRequiredSeqLength = 2) where T : INumber<T>
+    {
+        for (var i = 0; i < source.Count; i++)
+        {
+            for (var j = i + minRequiredSeqLength; j < source.Count; j++)
+            {
+                // Find a matching load value
+                if (source[i] == source[j])
+                {
+                    // Is the sequence to get there the same?
+                    var rlen = j - i;
+                    if (j + rlen >= source.Count)
+                        break;
+                    if (source[i..j].SequenceEqual(source[j..(j + rlen)]))
+                    {
+                        // If we can, then make sure the next sequence also matches just for good measure
+                        if (j + rlen + rlen >= source.Count || source[i..j].SequenceEqual(source[(j + rlen)..(j + rlen + rlen)]))
+                        {
+                            //Console.WriteLine($"Found range starting at i={i} for {j - i} elements");
+                            return (i, j - i);
+                        }
+                    }
+                }
+            }
+        }
+        return (-1, -1);
     }
 }
