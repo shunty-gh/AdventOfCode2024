@@ -1,4 +1,6 @@
-<Query Kind="Program" />
+<Query Kind="Program">
+  <Namespace>System.Numerics</Namespace>
+</Query>
 
 void Main()
 {
@@ -29,6 +31,9 @@ void Main()
 	loops.DumpTell();
 	loops[^(looplen+1)].Item1.DumpTell();
 	loops[^looplen..].Select(ll => ll.Item2).DumpTell();
+	
+	var rep = FindRepeatingSequence(loops.Select(ll => ll.Item2).Reverse().ToList());
+	rep.DumpTell();
 }
 
 public long RunLoop(long a)
@@ -41,3 +46,30 @@ public long RunLoop(long a)
 	return b % 8;
 }
 
+public static (int StartIndex, int SequenceLength) FindRepeatingSequence<T>(List<T> source, int minRequiredSeqLength = 2) where T : INumber<T>
+{
+	for (var i = 0; i < source.Count; i++)
+	{
+		for (var j = i + minRequiredSeqLength; j < source.Count; j++)
+		{
+			// Find a matching load value
+			if (source[i] == source[j])
+			{
+				// Is the sequence to get there the same?
+				var rlen = j - i;
+				if (j + rlen >= source.Count)
+					break;
+				if (source[i..j].SequenceEqual(source[j..(j + rlen)]))
+				{
+					// If we can, then make sure the next sequence also matches just for good measure
+					if (j + rlen + rlen >= source.Count || source[i..j].SequenceEqual(source[(j + rlen)..(j + rlen + rlen)]))
+					{
+						//Console.WriteLine($"Found range starting at i={i} for {j - i} elements");
+						return (i, j - i);
+					}
+				}
+			}
+		}
+	}
+	return (-1, -1);
+}
