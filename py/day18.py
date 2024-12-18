@@ -57,11 +57,13 @@ while i < len(input):
 
 print("Part 1", minsteps(allbytes, 1024))
 
-i = 1025
+# Turns out it's way quicker to add all possible bytes and then work back, reducing the
+# initial number by one each time, rather than brute force forward adding one at a time.
+i = len(allbytes)
 while True:
-    if not pathexists(allbytes, i):
-    #if minsteps(allbytes, i) == 0:   # pathexists() runs a tiny bit faster than minsteps
+    if pathexists(allbytes, i):
+    #if minsteps(allbytes, i) != 0:   # pathexists() runs a tiny, tiny bit faster than minsteps()
         break
-    i += 1
+    i -= 1
 
-print("Part 2", allbytes[i-1])
+print(f"Part 2 {allbytes[i][0]},{allbytes[i][1]}")
