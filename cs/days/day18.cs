@@ -24,62 +24,53 @@ public class Day18 : AocDaySolver
         this.ShowDayResult(1, part1);
 
         // Part 2
-        int bc = p1start + 1;
+        int bc = bytes.Count;
         while (true)
         {
-            var pp = FindShortest(bytes[.. bc]);
-            if (pp == 0)
+            var pp = FindShortest(bytes[.. bc], true);
+            if (pp != 0)
                 break;
-            bc += 1;
+            bc -= 1;
         }
-        Point2d part2 = bytes[bc-1];
+        Point2d part2 = bytes[bc];
         this.ShowDayResult(2, $"{part2.X},{part2.Y}");
     }
 
-    private static int FindShortest(List<Point2d> bytes)
+    private static int FindShortest(IReadOnlyList<Point2d> bytes, bool part2 = false)
     {
         HashSet<Point2d> bb = [.. bytes];
         var xlen = bb.Max(b => b.X);
         var ylen = bb.Max(b => b.Y);
 
         Dictionary<Point2d, int> seen = [];
-        Queue<(Point2d, int)> q = [];
-        q.Enqueue((new(0,0), 0));
+        Queue<Point2d> q = [];
+        q.Enqueue(new(0,0));
+        seen.Add(new(0,0), 0);
         Point2d target = new(xlen, ylen);
-        int minsteps = 0;
         while (q.Count > 0)
         {
-            var (c, s) = q.Dequeue();
+            var c = q.Dequeue();
             if (c == target)
             {
-                if (minsteps <= 0 || s < minsteps)
-                    minsteps = s;
+                if (part2)
+                    return 1;
                 continue;
             }
-            if (minsteps > 0 && s >= minsteps)
-                continue;
 
-            if (seen.TryGetValue(c, out var cmin) && cmin <= s)
-                continue;
-            seen[c] = s;
-
+            var cost = seen[c];
             foreach (var (dx, dy) in Point2d.NESW)
             {
                 Point2d nx = new(c.X + dx, c.Y + dy);
                 if (nx.X < 0 || nx.X > xlen || nx.Y < 0 || nx.Y > ylen || bb.Contains(nx))
                     continue;
-                if (nx == target)
+                if (!seen.TryGetValue(nx, out var nxseen) || nxseen > cost+1)
                 {
-                    if (minsteps <= 0 || minsteps > s)
-                        minsteps = s+1;
-                    continue;
+                    seen[nx] = cost + 1;
+                    q.Enqueue(nx);
                 }
-                if (seen.TryGetValue(nx, out var seennx) && seennx <= s+1)
-                    continue;
-                q.Enqueue((nx, s+1));
             }
         }
-        return minsteps;
+        return part2 ? 0 : seen[target];
     }
 
     // Expect P1: 22; P2: 6,1
