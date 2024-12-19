@@ -17,7 +17,8 @@ public class Day19 : AocDaySolver
         var part1 = patterns.Sum(p => CanMakePattern(towels, p));
         this.ShowDayResult(1, part1);
 
-        long part2 = patterns.Sum(p => PatternCombinations(towels, p, []));
+        Dictionary<string, long> cache = [];
+        long part2 = patterns.Sum(p => PatternCombinations(towels, p, cache));
         this.ShowDayResult(2, part2);
     }
 
