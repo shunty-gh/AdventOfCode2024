@@ -13,7 +13,7 @@ public class DayXX : AocDaySolver
     {
         //var input = (await File.ReadAllLinesAsync(AocUtils.FindInputFile(DayNumber))).ToImmutableList();
         //var input = (await File.ReadAllTextAsync(AocUtils.FindInputFile(DayNumber))).Split("\n\n");
-        //var input = TestInput.Split('\n').ToList();
+        //var input = (await Task.FromResult(TestInput.Trim())).Split('\n').ToImmutableList();
 
         int part1 = 0, part2 = 0;
         this.ShowDayResult(1, part1);
