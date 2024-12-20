@@ -1,5 +1,3 @@
-using System.Drawing;
-
 namespace Shunty.AoC.Days;
 
 // https://adventofcode.com/2024/day/20 - Race Condition
