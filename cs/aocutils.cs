@@ -134,6 +134,8 @@ public record Point2d(int X, int Y)
     public static readonly List<Point2d> NS = [new(0,-1), new(0,1)];
     public static readonly List<Point2d> NESW = [new(0,-1), new(1,0), new(0,1), new(-1,0)];
     public static readonly List<Point2d> Diagonals = [new(1,-1), new(1,1), new(-1,1), new(-1,-1)];
+
+    public int DistTo(Point2d to) => Math.Abs(X - to.X) + Math.Abs(Y - to.Y);
 }
 
 public record Point3d(int X, int Y, int Z);
