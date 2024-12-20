@@ -1,16 +1,17 @@
 namespace Shunty.AoC.Days;
 
-// https://adventofcode.com/2024/day/20 -
+// https://adventofcode.com/2024/day/20 - Race Condition
 
 public class Day20 : AocDaySolver
 {
     public int DayNumber => 20;
-    public string Title => "";
+    public string Title => "Race Condition";
+
+    public bool IsTest = true;
 
     public async Task Solve()
     {
         var input = (await File.ReadAllLinesAsync(AocUtils.FindInputFile(DayNumber))).ToList();
-        //var input = (await File.ReadAllTextAsync(AocUtils.FindInputFile(DayNumber))).Split("\n\n");
         //var input = (await Task.FromResult(TestInput.Trim())).Split('\n').Select(s => s.Trim()).ToList();
 
         HashSet<Point2d> walls = [];
@@ -30,43 +31,70 @@ public class Day20 : AocDaySolver
             }
         }
 
-        var bestNoCheat = Shortest(walls, start!, end, xmax, ymax, new(0,0), 0);
-        var part1 = 0;
-        foreach (var wall in walls)
-        {
-            if (wall.X == 0 || wall.Y == 0 || wall.X == xmax - 1 || wall.Y == ymax - 1)
-                continue;
-            var cheating = Shortest(walls, start!, end, xmax, ymax, wall, bestNoCheat);
-            if (bestNoCheat - cheating >= 100)
-                part1 += 1;
-            // if (cheating < bestNoCheat)
-            //     this.ShowDayResult(1, $"{cheating} (saving {bestNoCheat - cheating})");
-        }
+        var fromStart = Bfs(walls, start, end, xmax, ymax);
+        var fromEnd = Bfs(walls, end, start, xmax, ymax);
+        var bestNoCheat = fromStart[end];
+        this.ShowDayResult(1, Part1(fromStart, fromEnd, start, end, xmax, ymax));
 
         int part2 = 0;
-        this.ShowDayResult(1, part1);
         this.ShowDayResult(2, part2);
     }
 
-    private long Shortest(HashSet<Point2d> walls, Point2d start, Point2d end, int xmax, int ymax, Point2d missing, long target)
+    private static int Part1(Dictionary<Point2d, long> fromStart, Dictionary<Point2d, long> fromEnd, Point2d start, Point2d end, int xmax, int ymax)
+    {
+        var result = 0;
+        var threshold = 100;
+        var noCheatDist = fromStart[end];
+        for (var y = 0; y < ymax; y++)
+        {
+            for (var x = 0; x < xmax; x++)
+            {
+                Point2d p0 = new(x,y);
+                // Must not be a wall - ie must be on the track
+                if (!fromStart.ContainsKey(p0))
+                    continue;
+                foreach (var (dx1, dy1) in Point2d.NESW)
+                {
+                    Point2d p1 = new(p0.X + dx1, p0.Y + dy1);
+                    // Must be a wall - a cheat must be a wall followed by racetrack
+                    if (fromStart.ContainsKey(p1))
+                        continue;
+                    foreach (var (dx2, dy2) in Point2d.NESW)
+                    {
+                        Point2d p2 = new(p1.X + dx2, p1.Y + dy2);
+                        // Must be racetrack
+                        if (fromStart.ContainsKey(p2))
+                        {
+                            // Is it a shorter distance now
+                            var distToHere = fromStart[p0] + 2;
+                            var distFromHere = fromEnd[p2];
+                            var cheatDist = distToHere + distFromHere;
+                            if (noCheatDist - cheatDist >= threshold)
+                                result += 1;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    private static Dictionary<Point2d, long> Bfs(HashSet<Point2d> walls, Point2d start, Point2d end, int xmax, int ymax)
     {
         Queue<Point2d> q = [];
-        q.Enqueue(start);
         Dictionary<Point2d, long> seen = [];
         seen.Add(start, 0);
         seen.Add(end, long.MaxValue);
+        q.Enqueue(start);
 
         while (q.Count > 0)
         {
             var curr = q.Dequeue();
-
             var cost = seen[curr];
-            if ((target > 0 && cost > target) || cost > seen[end])
-                continue;
             foreach (var (dx, dy) in Point2d.NESW)
             {
                 Point2d nx = new(curr.X + dx, curr.Y + dy);
-                if (nx.X < 0 || nx.Y < 0 || nx.X >= xmax || nx.Y >= ymax || (walls.Contains(nx) && nx != missing))
+                if (nx.X <= 0 || nx.Y <= 0 || nx.X >= xmax-1 || nx.Y >= ymax-1 || walls.Contains(nx))
                     continue;
                 if (!seen.TryGetValue(nx, out var nxcost) || nxcost > cost + 1)
                 {
@@ -75,7 +103,7 @@ public class Day20 : AocDaySolver
                 }
             }
         }
-        return seen[end];
+        return seen;
     }
 
     private const string TestInput = """
