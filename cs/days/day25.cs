@@ -1,11 +1,11 @@
 namespace Shunty.AoC.Days;
 
-// https://adventofcode.com/2024/day/25 -
+// https://adventofcode.com/2024/day/25 - Code Chronicle
 
 public class Day25 : AocDaySolver
 {
     public int DayNumber => 25;
-    public string Title => "";
+    public string Title => "Code Chronicle";
 
     public async Task Solve()
     {
