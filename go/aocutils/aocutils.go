@@ -77,6 +77,6 @@ func DayHeader(day int) {
 	fmt.Printf("Day %d\n", day)
 }
 
-func PrintResult[R string | int | int32 | int64 | float64](part int, result R) {
+func PrintResult[R any](part int, result R) {
 	fmt.Printf("  Part %d: %v\n", part, result)
 }
