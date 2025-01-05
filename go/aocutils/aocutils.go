@@ -80,3 +80,11 @@ func DayHeader(day int) {
 func PrintResult[R any](part int, result R) {
 	fmt.Printf("  Part %d: %v\n", part, result)
 }
+
+// Simple inplace reverse of a slice
+// func Reverse[T any](a []T) []T {
+// 	for left, right := 0, len(a)-1; left < right; left, right = left+1, right-1 {
+// 		a[left], a[right] = a[right], a[left]
+// 	}
+// 	return a
+// }

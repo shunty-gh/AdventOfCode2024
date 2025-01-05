@@ -35,6 +35,14 @@ func (p Point2d) InRange(xmin, ymin, xmax, ymax int) bool {
 	return p.X >= xmin && p.X < xmax && p.Y >= ymin && p.Y < ymax
 }
 
+func (p Point2d) InRange0(xmax, ymax int) bool {
+	return p.X >= 0 && p.X < xmax && p.Y >= 0 && p.Y < ymax
+}
+
+func (p Point2d) Add(dx, dy int) Point2d {
+	return Point2d{p.X + dx, p.Y + dy}
+}
+
 func InRange(x, y, xmin, ymin, xmax, ymax int) bool {
 	return x >= xmin && x < xmax && y >= ymin && y < ymax
 }
