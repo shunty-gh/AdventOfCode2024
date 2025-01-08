@@ -66,6 +66,24 @@ func StringToInts(s string, sep string) ([]int, error) {
 	return result, nil
 }
 
+func StringToInts64(s string, sep string) ([]int64, error) {
+	s = strings.TrimSpace(s)
+	if s == "" {
+		return nil, errors.New("Empty string, no numbers found")
+	}
+	strs := strings.Split(s, sep)
+	result := make([]int64, len(strs))
+	for i := range result {
+		n, err := strconv.Atoi(strings.TrimSpace(strs[i]))
+		if err != nil {
+			return nil, err
+		} else {
+			result[i] = int64(n)
+		}
+	}
+	return result, nil
+}
+
 func Abs(a int) int {
 	if a < 0 {
 		return -a
