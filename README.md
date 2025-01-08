@@ -2,7 +2,7 @@
 
 ![AoC Mug](./mugshot.png)
 
-Some solutions for the [Advent of Code 2024](https://adventofcode.com/2024) puzzles. Variously attempted in [C#](./cs), [Python](./py) and [Rust](./rs). See the relevant directories for further details.
+Some solutions for the [Advent of Code 2024](https://adventofcode.com/2024) puzzles. Variously attempted in [C#](./cs), [Python](./py), [Go](./go) and [Rust](./rs). See the relevant directories for further details.
 
 
 ### Input data

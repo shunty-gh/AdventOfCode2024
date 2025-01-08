@@ -19,12 +19,24 @@ func Directions4() []Direction {
 	return []Direction{{0, -1}, {1, 0}, {0, 1}, {-1, 0}}
 }
 
+func DirectionsNS() []Direction {
+	return []Direction{{0, -1}, {0, 1}}
+}
+
 func Directions8() []Direction {
 	return []Direction{{0, -1}, {1, -1}, {1, 0}, {1, 1}, {0, 1}, {-1, 1}, {-1, 0}, {-1, -1}}
 }
 
+func Diagonals() []Direction {
+	return []Direction{{1, -1}, {1, 1}, {-1, 1}, {-1, -1}}
+}
+
 func (d Direction) TurnRight() Direction {
 	return Direction{-d.Y, d.X}
+}
+
+func (p Point2d) RotateRight() Point2d {
+	return Point2d{-p.Y, p.X}
 }
 
 func (p Point2d) Neighbours4() []Point2d {
