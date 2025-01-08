@@ -51,31 +51,31 @@ func InRange0(x, y, xmax, ymax int) bool {
 	return x >= 0 && x < xmax && y >= 0 && y < ymax
 }
 
-type Grid2d struct {
-	data         map[Point2d]byte
+type Grid2d[T byte | int] struct {
+	data         map[Point2d]T
 	CharNotFound byte
 }
 
-func NewGrid() *Grid2d {
-	result := new(Grid2d)
-	result.data = make(map[Point2d]byte)
+func NewGrid[T byte | int]() *Grid2d[T] {
+	result := new(Grid2d[T])
+	result.data = make(map[Point2d]T)
 	result.CharNotFound = ' '
 	return result
 }
 
-func NewGridFromLines(lines []string) *Grid2d {
-	result := NewGrid()
+func NewGridFromLines[T byte | int](lines []string) *Grid2d[T] {
+	result := NewGrid[T]()
 	result.ReadLines(lines, []byte{})
 	return result
 }
 
-func NewGridFromLinesIgnore(lines []string, ignoreChars []byte) *Grid2d {
-	result := NewGrid()
+func NewGridFromLinesIgnore[T byte | int](lines []string, ignoreChars []byte) *Grid2d[T] {
+	result := NewGrid[T]()
 	result.ReadLines(lines, ignoreChars)
 	return result
 }
 
-func (g *Grid2d) ReadLines(lines []string, ignoreChars []byte) {
+func (g *Grid2d[T]) ReadLines(lines []string, ignoreChars []byte) {
 	for y := 0; y < len(lines); y++ {
 		line := lines[y]
 		for x := 0; x < len(line); x++ {
@@ -84,25 +84,42 @@ func (g *Grid2d) ReadLines(lines []string, ignoreChars []byte) {
 				continue
 			}
 			p := Point2d{x, y}
-			g.data[p] = c
+			var def T
+			switch any(def).(type) {
+			case int:
+				g.data[p] = T(c - '0')
+			case byte:
+				g.data[p] = T(c)
+			}
 		}
 	}
 }
 
-func (g *Grid2d) CharAt(p Point2d) byte {
+func (g *Grid2d[T]) CharAt(p Point2d) T {
 	return g.data[p]
 }
 
-func (g *Grid2d) CharAtXY(x, y int) byte {
+func (g *Grid2d[T]) CharAtXY(x, y int) T {
 	p := Point2d{x, y}
 	return g.data[p]
 }
 
-func (g *Grid2d) Find(c byte) (Point2d, error) {
+func (g *Grid2d[T]) Find(c T) (Point2d, error) {
 	for k, v := range g.data {
 		if v == c {
 			return k, nil
 		}
 	}
 	return Point2d{0, 0}, fmt.Errorf("Value '%v' not found in grid", c)
+}
+
+func (g *Grid2d[T]) FindAll(c T) ([]Point2d, error) {
+	result := make([]Point2d, 0, len(g.data)/2)
+
+	for k, v := range g.data {
+		if v == c {
+			result = append(result, k)
+		}
+	}
+	return result, nil
 }

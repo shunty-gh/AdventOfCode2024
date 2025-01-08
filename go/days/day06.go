@@ -20,7 +20,7 @@ func Day06() {
 	aoc.CheckError(err)
 
 	xlen, ylen := len(lines[0]), len(lines)
-	grid := aoc.NewGridFromLinesIgnore(lines, []byte{'.'})
+	grid := aoc.NewGridFromLinesIgnore[byte](lines, []byte{'.'})
 	start, err := grid.Find('^')
 	aoc.CheckError(err)
 
@@ -73,7 +73,7 @@ func Day06() {
 // Walk the grid area, with an added obstacle at a given point. If this results in a
 // loop then push a 1 onto the output channel otherwise, if we wander out of bounds,
 // push 0 onto the channel
-func walkMapLookForLoop(grid *aoc.Grid2d, start aoc.Point2d, obstacle aoc.Point2d, xlen, ylen int, ch chan int) {
+func walkMapLookForLoop(grid *aoc.Grid2d[byte], start aoc.Point2d, obstacle aoc.Point2d, xlen, ylen int, ch chan int) {
 	seen := make(map[pointDirection]bool)
 	dir := aoc.Direction{X: 0, Y: -1} // start by going up
 	p := aoc.Point2d(start)
