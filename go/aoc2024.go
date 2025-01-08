@@ -20,6 +20,7 @@ func main() {
 	daymap[6] = days.Day06
 	daymap[7] = days.Day07
 	daymap[8] = days.Day08
+	daymap[9] = days.Day09
 
 	// Check command line args for which days to evaluate
 	// If none specified then run all days
