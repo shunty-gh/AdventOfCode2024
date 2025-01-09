@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 )
@@ -80,6 +81,21 @@ func StringToInts64(s string, sep string) ([]int64, error) {
 		} else {
 			result[i] = int64(n)
 		}
+	}
+	return result, nil
+}
+
+func FindAllInts[T byte | int8 | int | int16 | int32 | int64](s string) ([]T, error) {
+	result := make([]T, 0)
+	numRe := regexp.MustCompile(`[\+\-]?\d+`)
+	matches := numRe.FindAllString(s, -1)
+	for _, m := range matches {
+		v, err := strconv.ParseInt(m, 10, 64)
+		if err != nil {
+			return []T{}, err
+		}
+		num := T(v)
+		result = append(result, num)
 	}
 	return result, nil
 }

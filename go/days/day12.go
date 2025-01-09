@@ -7,7 +7,16 @@ import (
 	"strings"
 )
 
+type day12 struct {
+	day int
+}
+
 func Day12() {
+	d := &day12{12}
+	d.Run()
+}
+
+func (d *day12) Run() {
 	const testInput = `RRRRIICCFF
 RRRRIICCCF
 VVRRRCCFFF
@@ -19,21 +28,20 @@ MIIIIIJJEE
 MIIISIJEEE
 MMMISSJEEE`
 
-	const DAY = 12
 	var input []string
 	var err error
 	if slices.Contains(os.Args, "-t") {
 		input = strings.Split(strings.TrimSpace(testInput), "\n")
 	} else {
-		input, err = aoc.GetDayInputLines(DAY)
+		input, err = aoc.GetDayInputLines(d.day)
 		aoc.CheckError(err)
 	}
 
 	regions, pointIndex := buildRegions(input)
 
-	aoc.DayHeader(DAY)
-	aoc.PrintResult(1, part1(regions))
-	aoc.PrintResult(2, part2(regions, pointIndex))
+	aoc.DayHeader(d.day)
+	aoc.PrintResult(1, d.part1(regions))
+	aoc.PrintResult(2, d.part2(regions, pointIndex))
 }
 
 type plot struct {
@@ -41,7 +49,7 @@ type plot struct {
 	bounds int
 }
 
-func part1(regions map[int][]plot) int {
+func (d *day12) part1(regions map[int][]plot) int {
 	result := 0
 	for _, plots := range regions {
 		area := len(plots)
@@ -54,7 +62,7 @@ func part1(regions map[int][]plot) int {
 	return result
 }
 
-func part2(regions map[int][]plot, pointIndex map[aoc.Point2d]int) int {
+func (d *day12) part2(regions map[int][]plot, pointIndex map[aoc.Point2d]int) int {
 	// The number of sides can be determined by the total number of corners in the region.
 	// A corner is either an internal or an external corner.
 
