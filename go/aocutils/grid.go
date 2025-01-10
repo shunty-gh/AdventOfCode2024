@@ -13,10 +13,13 @@ type Direction struct {
 	X, Y int
 }
 
-//DirectionUp Direction = Direction{0, -1}
+var DirectionUp = Direction{0, -1}
+var DirectionRight = Direction{1, 0}
+var DirectionDown = Direction{0, 1}
+var DirectionLeft = Direction{-1, 0}
 
 func Directions4() []Direction {
-	return []Direction{{0, -1}, {1, 0}, {0, 1}, {-1, 0}}
+	return []Direction{DirectionUp, DirectionRight, DirectionDown, DirectionLeft}
 }
 
 func DirectionsNS() []Direction {
@@ -39,6 +42,21 @@ func (p Point2d) RotateRight() Point2d {
 	return Point2d{-p.Y, p.X}
 }
 
+func CharToDirection(c byte) Direction {
+	switch c {
+	case '^', 'n':
+		return DirectionUp
+	case '>', 'r':
+		return DirectionRight
+	case 'v', 'd':
+		return DirectionDown
+	case '<', 'l':
+		return DirectionLeft
+	default:
+		return Direction{0, 0}
+	}
+}
+
 func (p Point2d) Neighbours4() []Point2d {
 	return []Point2d{{p.X, p.Y - 1}, {p.X + 1, p.Y}, {p.X, p.Y + 1}, {p.X - 1, p.Y}}
 }
@@ -53,6 +71,10 @@ func (p Point2d) InRange0(xmax, ymax int) bool {
 
 func (p Point2d) Add(dx, dy int) Point2d {
 	return Point2d{p.X + dx, p.Y + dy}
+}
+
+func (p Point2d) AddDir(d Direction) Point2d {
+	return Point2d{p.X + d.X, p.Y + d.Y}
 }
 
 func InRange(x, y, xmin, ymin, xmax, ymax int) bool {
@@ -134,4 +156,29 @@ func (g *Grid2d[T]) FindAll(c T) ([]Point2d, error) {
 		}
 	}
 	return result, nil
+}
+
+func (g *Grid2d[T]) Set(p Point2d, v T) {
+	g.data[p] = v
+}
+
+func (g *Grid2d[T]) Remove(p Point2d) {
+	delete(g.data, p)
+}
+
+func (g *Grid2d[T]) Move(from Point2d, to Point2d) {
+	if v, ok := g.data[from]; ok {
+		g.data[to] = v
+		delete(g.data, from)
+	}
+}
+
+// Apply a function to each element of the grid and return a slice
+// containing the result of each application
+func Apply[T byte | int, R any](g *Grid2d[T], fn func(Point2d, T) R) []R {
+	result := []R{}
+	for k, v := range g.data {
+		result = append(result, fn(k, v))
+	}
+	return result
 }
