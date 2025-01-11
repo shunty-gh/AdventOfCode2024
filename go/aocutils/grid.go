@@ -13,10 +13,21 @@ type Direction struct {
 	X, Y int
 }
 
+type PointDirection struct {
+	Loc Point2d
+	Dir Direction
+}
+
 var DirectionUp = Direction{0, -1}
 var DirectionRight = Direction{1, 0}
 var DirectionDown = Direction{0, 1}
 var DirectionLeft = Direction{-1, 0}
+
+// Pointless aliases
+var DirectionN = DirectionUp
+var DirectionE = DirectionRight
+var DirectionS = DirectionDown
+var DirectionW = DirectionLeft
 
 func Directions4() []Direction {
 	return []Direction{DirectionUp, DirectionRight, DirectionDown, DirectionLeft}
@@ -145,6 +156,11 @@ func (g *Grid2d[T]) Find(c T) (Point2d, error) {
 		}
 	}
 	return Point2d{0, 0}, fmt.Errorf("Value '%v' not found in grid", c)
+}
+
+func (g *Grid2d[T]) TryGet(p Point2d) (v T, ok bool) {
+	v, ok = g.data[p]
+	return v, ok
 }
 
 func (g *Grid2d[T]) FindAll(c T) ([]Point2d, error) {
