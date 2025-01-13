@@ -32,6 +32,11 @@ func main() {
 	daymap[18] = days.Day18
 	daymap[19] = days.Day19
 	daymap[20] = days.Day20
+	daymap[21] = days.Day21
+	daymap[22] = days.Day22
+	daymap[23] = days.Day23
+	daymap[24] = days.Day24
+	daymap[25] = days.Day25
 
 	// Check command line args for which days to evaluate
 	// If none specified then run all days
