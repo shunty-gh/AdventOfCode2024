@@ -68,6 +68,10 @@ func CharToDirection(c byte) Direction {
 	}
 }
 
+func NewPoint2d(x, y int) Point2d {
+	return Point2d{x, y}
+}
+
 func (p Point2d) Neighbours4() []Point2d {
 	return []Point2d{{p.X, p.Y - 1}, {p.X + 1, p.Y}, {p.X, p.Y + 1}, {p.X - 1, p.Y}}
 }

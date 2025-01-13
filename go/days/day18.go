@@ -34,10 +34,10 @@ func (d *day18) Run() {
 
 func (d *day18) minSteps(bytes []aoc.Point2d, byteCount int) int {
 	corruption := aoc.ToSet(bytes[:byteCount])
-	seen := aoc.NewCounter[aoc.Point2d]()
+	seen := make(map[aoc.Point2d]int)
 	q := make([]aoc.Point2d, 0)
-	start := aoc.Point2d{X: 0, Y: 0}
-	target := aoc.Point2d{X: d.xLen - 1, Y: d.yLen - 1}
+	start := aoc.NewPoint2d(0, 0)
+	target := aoc.NewPoint2d(d.xLen-1, d.yLen-1)
 	seen[start] = 0
 	q = append(q, start)
 	for len(q) > 0 {
@@ -48,7 +48,7 @@ func (d *day18) minSteps(bytes []aoc.Point2d, byteCount int) int {
 		nxcost := cost + 1
 		for _, dir := range aoc.Directions4() {
 			nx := curr.AddDir(dir)
-			if nx.InRange0(d.xLen, d.yLen) && !aoc.SetContains(corruption, nx) {
+			if nx.InRange0(d.xLen, d.yLen) && !corruption.Contains(nx) {
 				if c, ok := seen[nx]; !ok || c > nxcost {
 					seen[nx] = nxcost
 					q = append(q, nx)
@@ -86,9 +86,9 @@ func (d *day18) pathExists(bytes []aoc.Point2d, byteCount int) bool {
 	corruption := aoc.ToSet(bytes[:byteCount])
 	seen := aoc.NewSet[aoc.Point2d]()
 	q := make([]aoc.Point2d, 0)
-	start := aoc.Point2d{X: 0, Y: 0}
-	target := aoc.Point2d{X: d.xLen - 1, Y: d.yLen - 1}
-	seen[start] = true
+	start := aoc.NewPoint2d(0, 0)
+	target := aoc.NewPoint2d(d.xLen-1, d.yLen-1)
+	seen.Add(start)
 	q = append(q, start)
 	for len(q) > 0 {
 		curr := q[0]
@@ -99,9 +99,9 @@ func (d *day18) pathExists(bytes []aoc.Point2d, byteCount int) bool {
 			if nx == target {
 				return true
 			}
-			if nx.InRange0(d.xLen, d.yLen) && !aoc.SetContains(corruption, nx) {
-				if _, ok := seen[nx]; !ok {
-					seen[nx] = true
+			if nx.InRange0(d.xLen, d.yLen) && !corruption.Contains(nx) {
+				if !seen.Contains(nx) {
+					seen.Add(nx)
 					q = append(q, nx)
 				}
 			}

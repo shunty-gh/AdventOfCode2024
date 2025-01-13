@@ -1,22 +1,42 @@
 package aocutils
 
-func ToSet[K comparable](src []K) map[K]bool {
-	result := make(map[K]bool, len(src))
+type Set[K comparable] struct {
+	data map[K]struct{}
+}
+
+func ToSet[K comparable](src []K) *Set[K] {
+	result := &Set[K]{data: make(map[K]struct{}, len(src))}
 	for _, v := range src {
-		result[v] = true
+		result.data[v] = struct{}{}
 	}
 	return result
 }
 
-func SetContains[K comparable, V any](set map[K]V, v K) bool {
-	_, ok := set[v]
+func NewSet[K comparable]() *Set[K] {
+	return &Set[K]{data: make(map[K]struct{})}
+}
+
+func (s *Set[K]) Contains(k K) bool {
+	_, ok := s.data[k]
 	return ok
 }
 
-func NewSet[K comparable]() map[K]bool {
-	return make(map[K]bool)
+func (s *Set[K]) Add(k K) {
+	s.data[k] = struct{}{}
 }
 
-func NewCounter[K comparable]() map[K]int {
-	return make(map[K]int)
+func (s *Set[K]) Remove(k K) {
+	delete(s.data, k)
+}
+
+func (s *Set[K]) Count() int {
+	return len(s.data)
+}
+
+func (s *Set[K]) Keys() []K {
+	result := make([]K, 0, len(s.data))
+	for k := range s.data {
+		result = append(result, k)
+	}
+	return result
 }
