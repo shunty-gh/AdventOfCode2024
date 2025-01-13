@@ -10,7 +10,7 @@ import (
 )
 
 func GetDayInputLines(day int) ([]string, error) {
-	if day <= 0 || day >= 25 {
+	if day <= 0 || day > 25 {
 		return nil, fmt.Errorf("Invalid day number '%d'", day)
 	}
 	fn := fmt.Sprintf("../input/day%02d-input", day)
@@ -18,7 +18,7 @@ func GetDayInputLines(day int) ([]string, error) {
 }
 
 func GetDayInputString(day int) (string, error) {
-	if day <= 0 || day >= 25 {
+	if day <= 0 || day > 25 {
 		return "", fmt.Errorf("Invalid day number '%d'", day)
 	}
 	fn := fmt.Sprintf("../input/day%02d-input", day)
