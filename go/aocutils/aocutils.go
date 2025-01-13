@@ -100,6 +100,14 @@ func FindAllInts[T byte | int8 | int | int16 | int32 | int64](s string) ([]T, er
 	return result, nil
 }
 
+func IntsToStr[T byte | int8 | int | int16 | int32 | int64](nums []T, separator string) string {
+	result := ""
+	for _, v := range nums {
+		result += fmt.Sprintf("%s%d", separator, v)
+	}
+	return result[1:] // Don't return the first separator
+}
+
 func Abs(a int) int {
 	if a < 0 {
 		return -a
