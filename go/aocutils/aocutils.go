@@ -39,7 +39,7 @@ func GetInputString(fileName string) (string, error) {
 	if err != nil {
 		return "", err
 	} else {
-		return strings.TrimSpace(string(in)), nil
+		return strings.Replace(strings.TrimSpace(string(in)), "\r\n", "\n", -1), nil
 	}
 }
 
