@@ -32,7 +32,14 @@ func (c *Counter[K]) Get(k K) int {
 	return 0
 }
 
-func (c *Counter[K]) Len() int {
+func (c *Counter[K]) TryGet(k K) (int, bool) {
+	if v, ok := c.data[k]; ok {
+		return v, true
+	}
+	return 0, false
+}
+
+func (c *Counter[K]) Count() int {
 	return len(c.data)
 }
 
