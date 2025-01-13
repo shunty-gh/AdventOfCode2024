@@ -40,3 +40,24 @@ func (s *Set[K]) Keys() []K {
 	}
 	return result
 }
+
+func (s *Set[K]) Union(other *Set[K]) *Set[K] {
+	result := NewSet[K]()
+	for k := range s.data {
+		result.Add(k)
+	}
+	for k := range other.data {
+		result.Add(k)
+	}
+	return result
+}
+
+func (s *Set[K]) Intersect(other *Set[K]) *Set[K] {
+	result := NewSet[K]()
+	for k := range s.data {
+		if other.Contains(k) {
+			result.Add(k)
+		}
+	}
+	return result
+}
