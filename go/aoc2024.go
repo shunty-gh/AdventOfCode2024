@@ -38,24 +38,24 @@ func main() {
 	daymap[24] = days.Day24
 	daymap[25] = days.Day25
 
-	// Check command line args for which days to evaluate
-	// If none specified then run all days
-	days := make([]int, 0)
+	// Check command line args for which daysToRun to evaluate
+	// If none specified then run all daysToRun
+	daysToRun := make([]int, 0)
 	for _, arg := range os.Args {
 		if b, n := isValidAoCDayNumber(arg); b {
-			days = append(days, n)
+			daysToRun = append(daysToRun, n)
 		}
 	}
-	if len(days) == 0 {
-		days = append(days, slices.Collect(maps.Keys(daymap))...)
+	if len(daysToRun) == 0 {
+		daysToRun = append(daysToRun, slices.Collect(maps.Keys(daymap))...)
 	}
-	sort.Ints(days)
+	sort.Ints(daysToRun)
 
 	fmt.Println()
 	fmt.Println("Advent Of Code 2024 in Go")
 	fmt.Println()
 
-	for _, day := range days {
+	for _, day := range daysToRun {
 		daymap[day]()
 		fmt.Println()
 	}
