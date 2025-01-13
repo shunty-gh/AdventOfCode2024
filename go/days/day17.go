@@ -2,7 +2,6 @@ package days
 
 import (
 	aoc "aoc2024/aocutils"
-	"fmt"
 	"strconv"
 	"strings"
 )
@@ -29,12 +28,12 @@ func (d *day17) Run() {
 	program, _ := aoc.StringToInts(strings.Split(strings.TrimSpace(sp[1]), " ")[1], ",")
 
 	aoc.DayHeader(d.day)
-	aoc.PrintResult(1, d.runProgram(program, registers[:]))
-	aoc.PrintResult(2, 0)
+	aoc.PrintResult(1, aoc.IntsToStr(d.runProgram(program, registers[:]), ","))
+	aoc.PrintResult(2, d.part2(program))
 }
 
-func (d *day17) runProgram(program []int, registers []int64) string {
-	output := make([]int64, 0)
+func (d *day17) runProgram(program []int, registers []int64) []int {
+	output := make([]int, 0)
 	reg := append([]int64{}, registers...)
 	opvalue := func(op int64) int64 {
 		if op <= 3 {
@@ -61,7 +60,7 @@ func (d *day17) runProgram(program []int, registers []int64) string {
 		case 4:
 			reg[1] = reg[1] ^ reg[2]
 		case 5:
-			output = append(output, opvalue(operand)%8)
+			output = append(output, int(opvalue(operand)%8))
 		case 6:
 			reg[1] = reg[0] / (1 << opvalue(operand))
 		case 7:
@@ -75,9 +74,39 @@ func (d *day17) runProgram(program []int, registers []int64) string {
 			ip += 2
 		}
 	}
-	result := ""
-	for _, v := range output {
-		result += fmt.Sprintf("%d,", v)
+	return output
+}
+
+func (d *day17) part2(program []int) int64 {
+	return d.solveForA(program, program, 0)
+}
+
+// For part 2 we work backwards trying to solve each digit from the last to the first.
+// It's a 3-bit computer so we run the program for each value 0..7 to get the current
+// target digit then multiply by eight and try and solve the next digit.
+func (d *day17) solveForA(program []int, target []int, currentA int64) int64 {
+	if len(target) == 0 {
+		return currentA
 	}
-	return result
+
+	for i := range 8 {
+		nexta := currentA*int64(8) + int64(i)
+		regs := []int64{nexta, 0, 0}
+		soln := d.runProgram(program, regs)
+		// The solution will slowly build to the full program so for each level we
+		// want the first digit in our current solution to equal the last digit in
+		// the target
+		if soln[0] != target[len(target)-1] {
+			continue
+		}
+		// If correct so far, then solve for the next digit in the target using
+		// the current value of A
+		sol := d.solveForA(program, target[:len(target)-1], nexta)
+		if sol < 0 {
+			continue
+		} else {
+			return sol
+		}
+	}
+	return -1
 }
