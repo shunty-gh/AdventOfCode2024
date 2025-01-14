@@ -4,7 +4,7 @@ package days
 
 import (
 	aoc "aoc2024/aocutils"
-	"sort"
+	"slices"
 )
 
 func Day01() {
@@ -25,8 +25,8 @@ func Day01() {
 		rmap[nums[1]] = rmap[nums[1]] + 1
 	}
 
-	sort.Ints(l)
-	sort.Ints(r)
+	slices.Sort(l)
+	slices.Sort(r)
 	part1 := 0
 	for i := 0; i < len(l); i++ {
 		d := aoc.Abs(l[i] - r[i])

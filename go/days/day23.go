@@ -4,7 +4,7 @@ package days
 
 import (
 	aoc "aoc2024/aocutils"
-	"sort"
+	"slices"
 	"strings"
 )
 
@@ -28,21 +28,21 @@ func (d *day23) Run() {
 		lan[sp[1]] = append(lan[sp[1]], sp[0])
 	}
 	for _, v := range lan {
-		sort.Strings(v)
+		slices.Sort(v)
 	}
 
 	p1 := aoc.NewSet[[3]string]()
 	p2 := aoc.NewCounter[string]()
 	for k1, v := range lan {
 		for _, k2 := range v {
-			common := aoc.StringsIntersect(v, lan[k2])
+			common := aoc.Intersect(v, lan[k2])
 			if len(common) > 0 {
 
 				// Part 1
 				for _, k3 := range common {
 					if strings.HasPrefix(k1, "t") || strings.HasPrefix(k2, "t") || strings.HasPrefix(k3, "t") {
 						connected := []string{k1, k2, k3}
-						sort.Strings(connected)
+						slices.Sort(connected)
 						p1.Add([3]string(connected))
 					}
 				}
@@ -51,7 +51,7 @@ func (d *day23) Run() {
 				if len(common) > 1 {
 					party := []string{k1, k2}
 					party = append(party, common...)
-					sort.Strings(party)
+					slices.Sort(party)
 					partykey := strings.Join(party, ",")
 					p2.Add(partykey)
 				}
