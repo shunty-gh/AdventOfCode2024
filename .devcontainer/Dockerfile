@@ -1,5 +1,5 @@
 # Dockerfile for writing and running solutions to the Advent Of Code 2024
-# in C#/Dotnet 9, Python 3 and Rust. Used in conjunction with the
+# in C#/Dotnet 9, Python 3, Go and Rust. Used in conjunction with the
 # associated devcontainer.json
 FROM mcr.microsoft.com/devcontainers/dotnet:9.0
 
@@ -23,7 +23,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-venv \
     && rm -rf /var/lib/apt/lists/*
 
-# Rust is installed from within the devcontainer.json
+# Rust is installed from the devcontainer features
+
+# Go is installed from the devcontainer features
+
+# Go - https://go.dev/doc/install
+# Remove previous versions
+# RUN wget https://go.dev/dl/go1.23.4.linux-amd64.tar.gz \
+#     && rm -rf /usr/local/go \
+#     && tar -C /usr/local -xzf go1.23.4.linux-amd64.tar.gz
+# ENV GOROOT=/usr/local/go
+# ENV GOPATH /go
+# ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
 
 # Dotnet workload
 RUN dotnet workload update

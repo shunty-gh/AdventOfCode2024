@@ -16,6 +16,7 @@
          }
          ,"ghcr.io/devcontainers/features/python:1": {}
 		,"ghcr.io/devcontainers/features/rust:1": {}
+        ,"ghcr.io/devcontainers/features/go:1": {}
     },
 
     "customizations": {
@@ -25,6 +26,7 @@
                 ,"ms-dotnettools.csdevkit"
                 ,"vscode-icons-team.vscode-icons"
                 ,"phil294.git-log--graph"
+                ,"golang.go"
             ],
             "settings": {
                 "terminal.integrated.shell.linux": "/bin/bash"
