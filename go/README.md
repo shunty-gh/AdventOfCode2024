@@ -5,13 +5,15 @@ Some solutions for the [Advent of Code 2024](https://adventofcode.com/2024) puzz
 > DISCLAIMER:
 > I am a complete Go beginner
 
-All of these Go solutions were written after the 25th December and after I had written them in C# (and possibly Python or Rust). Therefore they have the benefit of hindsight and the knowledge of how to actually solve the problem. They were written as a learning experience and, in theory, they might even improve on some of my original solutions. 
+All of these Go solutions were written after the 25th December and after I had written them in C# (and possibly Python or Rust). Therefore they have the benefit of hindsight and the knowledge of how to actually solve the problem. They were written as a learning experience and, in theory, some of them might even improve on my original solutions. 
 
 ## Pre-requisites
 
 * [Go installed](https://go.dev/dl)
 * (Optional) [Visual Studio Code](https://code.visualstudio.com/)
 * (Optional) Any other C# code editor, notepad, IDE, environment, cloud eg [GoLand](https://www.jetbrains.com/go/)
+
+These solutions were written using Go v1.23.4
 
 ## Run
 
