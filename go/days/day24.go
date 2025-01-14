@@ -14,7 +14,7 @@ type day24 struct {
 }
 
 type day24Gate struct {
-	inL, op, inR string
+	inL, op, inR, out string
 }
 
 func Day24() {
@@ -38,13 +38,21 @@ func (d *day24) Run() {
 	gates := make(map[string]day24Gate)
 	for _, ln := range sp1 {
 		gg := strings.Split(strings.TrimSpace(ln), " ")
-		gate := day24Gate{gg[0], gg[1], gg[2]}
+		gate := day24Gate{gg[0], gg[1], gg[2], gg[4]}
 		gates[gg[4]] = gate
 	}
 
 	aoc.DayHeader(d.day)
 	aoc.PrintResult(1, d.calculateZ(gates, inits))
-	aoc.PrintResult(2, 0)
+
+	badgates := d.findBadGates(gates)
+	part2 := make([]string, 0, len(badgates))
+	for _, g := range badgates {
+		part2 = append(part2, g.out)
+	}
+	slices.Sort(part2)
+	//aoc.PrintResult(2, badgates)
+	aoc.PrintResult(2, strings.Join(part2, ","))
 }
 
 func (d *day24) calculateZ(gates map[string]day24Gate, startValues map[string]bool) int64 {
@@ -97,6 +105,69 @@ func (d *day24) bitsToLong(bits map[string]bool) int64 {
 	for i := 0; i < len(zv); i++ {
 		if bits[zv[i]] {
 			result += 1 << i
+		}
+	}
+	return result
+}
+
+// There's no way I worked this out for myself, but it is a whole lot better
+// than my original C# version (which did actually work but was a lot more convoluted).
+// This came about with so much help from:
+// https://www.reddit.com/r/adventofcode/comments/1hla5ql/2024_day_24_part_2_a_guide_on_the_idea_behind_the/
+// and https://www.bytesizego.com/blog/aoc-day24-golang
+// and, perhaps, https://en.wikipedia.org/wiki/Adder_(electronics)#Ripple-carry_adder
+func (d *day24) findBadGates(gates map[string]day24Gate) []day24Gate {
+	result := make([]day24Gate, 0)
+
+	// There are 4 rules that determine whether a gate is bad or not
+	for k, g := range gates {
+		// Any z wire, unless it is the last one, must be the result of an XOR gate
+		if k[0] == 'z' && k != "z45" && g.op != "XOR" {
+			result = append(result, g)
+			continue
+		}
+		// Any XOR gate must output to z OR must have x or y inputs
+		if k[0] != 'z' && g.op == "XOR" && g.inL[0] != 'x' && g.inL[0] != 'y' && g.inR[0] != 'x' && g.inR[0] != 'y' {
+			result = append(result, g)
+			continue
+		}
+		// If an XOR gate has both x and y inputs then there must be another XOR gate
+		// that takes the output of this gate as one of its inputs. The x and y inputs must not be x00 or y00.
+		if g.op == "XOR" &&
+			((g.inL[0] == 'x' && g.inR[0] == 'y') || (g.inL[0] == 'y' && g.inR[0] == 'x')) &&
+			g.inL != "x00" && g.inL != "y00" && g.inR != "x00" && g.inR != "y00" {
+
+			found := false
+			for _, g2 := range gates {
+				if g2.op == "XOR" {
+					if g2.inL == g.out || g2.inR == g.out {
+						found = true
+					}
+				}
+			}
+			if !found {
+				result = append(result, g)
+				continue
+			}
+		}
+		// If an AND gate has both x and y inputs then there must be another OR gate
+		// that takes the output of this gate as one of its inputs. The x and y inputs must not be x00 or y00.
+		if g.op == "AND" &&
+			((g.inL[0] == 'x' && g.inR[0] == 'y') || (g.inL[0] == 'y' && g.inR[0] == 'x')) &&
+			g.inL != "x00" && g.inL != "y00" && g.inR != "x00" && g.inR != "y00" {
+
+			found := false
+			for _, g2 := range gates {
+				if g2.op == "OR" {
+					if g2.inL == g.out || g2.inR == g.out {
+						found = true
+					}
+				}
+			}
+			if !found {
+				result = append(result, g)
+				continue
+			}
 		}
 	}
 	return result
