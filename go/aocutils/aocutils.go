@@ -1,6 +1,7 @@
 package aocutils
 
 import (
+	"cmp"
 	"errors"
 	"fmt"
 	"os"
@@ -131,13 +132,13 @@ func PrintResult[R any](part int, result R) {
 // 	return a
 // }
 
-// An intersection method for two *sorted* slices of strings
-func StringsIntersect(s1, s2 []string) []string {
+// An intersection method for two *sorted* slices of an ordered type T
+func Intersect[T cmp.Ordered](s1, s2 []T) []T {
 	minlen := len(s1)
 	if len(s2) < minlen {
 		minlen = len(s2)
 	}
-	common := make([]string, 0, minlen)
+	common := make([]T, 0, minlen)
 	for i, j := 0, 0; i < len(s1) && j < len(s2); {
 		if s1[i] == s2[j] {
 			common = append(common, s1[i])
