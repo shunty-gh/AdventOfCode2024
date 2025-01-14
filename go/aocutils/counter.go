@@ -21,6 +21,14 @@ func (c *Counter[K]) Add(k K) {
 	}
 }
 
+func (c *Counter[K]) Inc(k K, amount int) {
+	if v, ok := c.data[k]; !ok {
+		c.data[k] = amount
+	} else {
+		c.data[k] = v + amount
+	}
+}
+
 func (c *Counter[K]) Set(k K, v int) {
 	c.data[k] = v
 }
@@ -55,6 +63,16 @@ func (c *Counter[K]) Values() []int {
 	result := make([]int, 0, len(c.data))
 	for _, v := range c.data {
 		result = append(result, v)
+	}
+	return result
+}
+
+func (c *Counter[K]) MaxValue() int {
+	result := 0
+	for _, v := range c.data {
+		if v > result {
+			result = v
+		}
 	}
 	return result
 }
