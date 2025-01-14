@@ -6,7 +6,6 @@ import (
 	"maps"
 	"os"
 	"slices"
-	"sort"
 	"strconv"
 )
 
@@ -49,7 +48,7 @@ func main() {
 	if len(daysToRun) == 0 {
 		daysToRun = append(daysToRun, slices.Collect(maps.Keys(daymap))...)
 	}
-	sort.Ints(daysToRun)
+	slices.Sort(daysToRun)
 
 	fmt.Println()
 	fmt.Println("Advent Of Code 2024 in Go")
