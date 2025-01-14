@@ -67,11 +67,25 @@ func (c *Counter[K]) Values() []int {
 	return result
 }
 
+// Return the larget count in the set
 func (c *Counter[K]) MaxValue() int {
 	result := 0
 	for _, v := range c.data {
 		if v > result {
 			result = v
+		}
+	}
+	return result
+}
+
+// Return the key for the entry with the largest count
+func (c *Counter[K]) MaxKey() K {
+	var result K
+	maxv := 0
+	for k, v := range c.data {
+		if v > maxv {
+			maxv = v
+			result = k
 		}
 	}
 	return result
