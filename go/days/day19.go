@@ -1,5 +1,7 @@
 package days
 
+// https://adventofcode.com/2024/day/19 - Linen Layout
+
 import (
 	aoc "aoc2024/aocutils"
 	"strings"

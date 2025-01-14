@@ -1,5 +1,7 @@
 package days
 
+// https://adventofcode.com/2024/day/23 - LAN Party
+
 import (
 	aoc "aoc2024/aocutils"
 )

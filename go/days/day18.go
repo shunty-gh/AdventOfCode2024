@@ -1,5 +1,7 @@
 package days
 
+// https://adventofcode.com/2024/day/18 - RAM Run
+
 import (
 	aoc "aoc2024/aocutils"
 	"fmt"

@@ -1,5 +1,7 @@
 package days
 
+// https://adventofcode.com/2024/day/3 - Mull It Over
+
 import (
 	aoc "aoc2024/aocutils"
 	"regexp"

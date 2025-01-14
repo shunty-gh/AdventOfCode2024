@@ -1,5 +1,7 @@
 package days
 
+// https://adventofcode.com/2024/day/11 - Plutonian Pebbles
+
 import (
 	aoc "aoc2024/aocutils"
 	"strconv"
