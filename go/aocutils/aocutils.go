@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func GetDayInputLines(day int) ([]string, error) {
@@ -151,4 +152,11 @@ func Intersect[T cmp.Ordered](s1, s2 []T) []T {
 		}
 	}
 	return common
+}
+
+// Simple mechanism to time a function. Call `defer timeIt(time.Now(), "Day XX")`
+// at the start of the function to time
+func TimeIt(start time.Time, caption string) {
+	elapsed := time.Since(start)
+	fmt.Printf("%s took %s\n", caption, elapsed)
 }

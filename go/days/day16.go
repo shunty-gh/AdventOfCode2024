@@ -4,6 +4,7 @@ package days
 
 import (
 	aoc "aoc2024/aocutils"
+	"slices"
 )
 
 type day16 struct {
@@ -26,9 +27,10 @@ func (d *day16) Run() {
 	start, _ := grid.Find('S')
 	end, _ := grid.Find('E')
 
-	part1, part2 := d.bestPath(grid, start, end)
 	aoc.DayHeader(d.day)
+	part1 := d.bestPath(grid, start, end)
 	aoc.PrintResult(1, part1)
+	part2 := d.bestPaths(grid, start, end, part1)
 	aoc.PrintResult(2, part2)
 }
 
@@ -39,63 +41,83 @@ type d16qItem struct {
 	cost int
 }
 
-func (d *day16) bestPath(grid *aoc.Grid2d[byte], start aoc.Point2d, target aoc.Point2d) (int, int) {
+// Get the best score for a path from start to end
+func (d *day16) bestPath(grid *aoc.Grid2d[byte], start aoc.Point2d, target aoc.Point2d) int {
+	seen := aoc.NewSet[aoc.PointDirection]()
+	q := []d16qItem{{start, nil, aoc.DirectionE, 0}}
+	for len(q) > 0 {
+		// The crucial bit. A fake priority queue.
+		slices.SortFunc(q, func(i, j d16qItem) int { return i.cost - j.cost })
+		curr := q[0]
+		q = q[1:]
+
+		if curr.loc == target {
+			return curr.cost
+		}
+		k := aoc.PointDirection{Loc: curr.loc, Dir: curr.dir}
+		if seen.Contains(k) {
+			continue
+		}
+		seen.Add(k)
+
+		for _, dir := range aoc.Directions4() {
+			nx := curr.loc.AddDir(dir)
+			if c, ok := grid.TryGet(nx); ok && c != d.wall {
+				nxcost := curr.cost + 1
+				if dir != curr.dir {
+					nxcost += 1000 // A turn AND a move
+				}
+				q = append(q, d16qItem{nx, nil, dir, nxcost})
+			}
+		}
+	}
+	return -1 // This should never happen
+}
+
+// Find the unique points in all paths that have a score equal to bestScore
+func (d *day16) bestPaths(grid *aoc.Grid2d[byte], start aoc.Point2d, target aoc.Point2d, bestScore int) int {
 	seen := make(map[aoc.PointDirection]int)
 	seen[aoc.PointDirection{Loc: start, Dir: aoc.DirectionE}] = 0
-	bestpaths := make(map[int][][]aoc.Point2d)
+	bestset := aoc.NewSet[aoc.Point2d]()
 
-	q := make([]d16qItem, 0)
-	q = append(q, d16qItem{start, []aoc.Point2d{start}, aoc.DirectionE, 0})
-	bestscore := 0
+	q := []d16qItem{{start, []aoc.Point2d{start}, aoc.DirectionE, 0}}
 	for len(q) > 0 {
 		curr := q[0]
 		q = q[1:]
 
-		if bestscore > 0 && curr.cost >= bestscore {
-			continue
-		}
+		// Do our existence and validity checks *before* adding to the queue
+		// as opposed to after popping off the queue. This will work fine as
+		// we already know the exact target score we're looking for.
 
 		for _, dir := range aoc.Directions4() {
 			nx := curr.loc.AddDir(dir)
 			nxcost := curr.cost + 1
 			if dir != curr.dir {
-				nxcost = curr.cost + 1001 // A turn AND a move
+				nxcost += 1000 // A turn AND a move
 			}
-			if bestscore > 0 && nxcost > bestscore {
+			if nx == target && bestScore == nxcost {
+				bestset.AddSlice(curr.path)
+				bestset.Add(nx)
 				continue
 			}
-			if nx == target {
-				if bestscore == 0 || bestscore >= nxcost { // '>=' so we get all possible best paths
-					bestscore = nxcost
-					newpath := append([]aoc.Point2d{}, curr.path...)
-					newpath = append(newpath, nx)
-					pp := bestpaths[nxcost]
-					pp = append(pp, newpath)
-					bestpaths[nxcost] = pp
-					continue
-				}
+			if nxcost >= bestScore {
+				continue
 			}
 			if c, ok := grid.TryGet(nx); ok && c != d.wall {
 				pd := aoc.PointDirection{Loc: nx, Dir: dir}
-				// This comparison has to be '<' as opposed to '<=' because
-				// in P2 we want all the possible best paths
+				// If the cost of this move is greater than the cost we've
+				// already seen at this point then skip it
 				if v, ok := seen[pd]; ok && v < nxcost {
 					continue
 				}
 				seen[pd] = nxcost
-				newpath := append([]aoc.Point2d{}, curr.path...)
-				newpath = append(newpath, nx)
+				newpath := make([]aoc.Point2d, len(curr.path)+1)
+				copy(newpath, curr.path)
+				newpath[len(curr.path)-1] = nx
 				q = append(q, d16qItem{nx, newpath, dir, nxcost})
 			}
 		}
 	}
 
-	bp := bestpaths[bestscore]
-	bestset := make(map[aoc.Point2d]bool)
-	for _, p := range bp {
-		for _, pp := range p {
-			bestset[pp] = true
-		}
-	}
-	return bestscore, len(bestset)
+	return bestset.Count()
 }

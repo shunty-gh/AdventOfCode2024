@@ -25,6 +25,13 @@ func (s *Set[K]) Add(k K) {
 	s.data[k] = struct{}{}
 }
 
+func (s *Set[K]) AddSlice(ks []K) {
+	for _, k := range ks {
+		s.data[k] = struct{}{}
+		//s.Add(k)
+	}
+}
+
 func (s *Set[K]) Remove(k K) {
 	delete(s.data, k)
 }

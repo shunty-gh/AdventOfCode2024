@@ -37,8 +37,8 @@ func main() {
 	daymap[24] = days.Day24
 	daymap[25] = days.Day25
 
-	// Check command line args for which daysToRun to evaluate
-	// If none specified then run all daysToRun
+	// Check command line args for which days to run
+	// If none specified then run all days
 	daysToRun := make([]int, 0)
 	for _, arg := range os.Args {
 		if b, n := isValidAoCDayNumber(arg); b {
@@ -55,7 +55,11 @@ func main() {
 	fmt.Println()
 
 	for _, day := range daysToRun {
-		daymap[day]()
+		if d, ok := daymap[day]; ok {
+			d()
+		} else {
+			fmt.Printf("Solution for day %d is not available\n", day)
+		}
 		fmt.Println()
 	}
 }
