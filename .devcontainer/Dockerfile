@@ -16,12 +16,13 @@ RUN apt update && apt install -y --no-install-recommends \
     mc htop ripgrep fd-find dnsutils iproute2 jq zsh \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 \
-    python3-pip \
-    python3-venv \
-    && rm -rf /var/lib/apt/lists/*
+# Python is installed from the devcontainer features
+
+# RUN apt-get update && apt-get install -y --no-install-recommends \
+#     python3 \
+#     python3-pip \
+#     python3-venv \
+#     && rm -rf /var/lib/apt/lists/*
 
 # Rust is installed from the devcontainer features
 
