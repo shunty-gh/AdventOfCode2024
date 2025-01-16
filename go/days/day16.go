@@ -55,7 +55,6 @@ func (d *day16) Run() {
 
 type d16qItem struct {
 	loc  aoc.Point2d
-	path []aoc.Point2d
 	dir  aoc.Direction
 	cost int
 }
@@ -68,7 +67,7 @@ func (d *day16) costsFromStart(grid *aoc.Grid2d[byte], start aoc.Point2d, target
 	best := 0
 
 	pq := make(PriorityQueue, 1)
-	pq[0] = &d16qItem{start, nil, aoc.DirectionE, 0}
+	pq[0] = &d16qItem{start, aoc.DirectionE, 0}
 	heap.Init(&pq)
 	for pq.Len() > 0 {
 		curr := heap.Pop(&pq).(*d16qItem)
@@ -87,10 +86,10 @@ func (d *day16) costsFromStart(grid *aoc.Grid2d[byte], start aoc.Point2d, target
 
 		nx := curr.loc.AddDir(curr.dir)
 		if c, ok := grid.TryGet(nx); ok && c != d.wall {
-			heap.Push(&pq, &d16qItem{nx, nil, curr.dir, curr.cost + 1})
+			heap.Push(&pq, &d16qItem{nx, curr.dir, curr.cost + 1})
 		}
-		heap.Push(&pq, &d16qItem{curr.loc, nil, curr.dir.TurnLeft(), curr.cost + 1000})
-		heap.Push(&pq, &d16qItem{curr.loc, nil, curr.dir.TurnRight(), curr.cost + 1000})
+		heap.Push(&pq, &d16qItem{curr.loc, curr.dir.TurnLeft(), curr.cost + 1000})
+		heap.Push(&pq, &d16qItem{curr.loc, curr.dir.TurnRight(), curr.cost + 1000})
 	}
 	// Technically we don't need to store/return the best score as we can find it from
 	// the dist counter as the minimum of the NESW entries at the target point.
@@ -106,10 +105,10 @@ func (d *day16) costsFromEnd(grid *aoc.Grid2d[byte], target aoc.Point2d) *aoc.Co
 	seen := aoc.NewSet[aoc.PointDirection]()
 
 	pq := make(PriorityQueue, 4)
-	pq[0] = &d16qItem{target, nil, aoc.DirectionN, 0}
-	pq[1] = &d16qItem{target, nil, aoc.DirectionE, 0}
-	pq[2] = &d16qItem{target, nil, aoc.DirectionS, 0}
-	pq[3] = &d16qItem{target, nil, aoc.DirectionW, 0}
+	pq[0] = &d16qItem{target, aoc.DirectionN, 0}
+	pq[1] = &d16qItem{target, aoc.DirectionE, 0}
+	pq[2] = &d16qItem{target, aoc.DirectionS, 0}
+	pq[3] = &d16qItem{target, aoc.DirectionW, 0}
 	heap.Init(&pq)
 	for pq.Len() > 0 {
 		curr := heap.Pop(&pq).(*d16qItem)
@@ -126,11 +125,11 @@ func (d *day16) costsFromEnd(grid *aoc.Grid2d[byte], target aoc.Point2d) *aoc.Co
 		// NB: Reverse direction as we're getting shortest paths *from the end*
 		nx := curr.loc.AddDir(curr.dir.Reverse())
 		if c, ok := grid.TryGet(nx); ok && c != d.wall {
-			heap.Push(&pq, &d16qItem{nx, nil, curr.dir, curr.cost + 1})
+			heap.Push(&pq, &d16qItem{nx, curr.dir, curr.cost + 1})
 		}
 		// But left and right turns are still the same
-		heap.Push(&pq, &d16qItem{curr.loc, nil, curr.dir.TurnLeft(), curr.cost + 1000})
-		heap.Push(&pq, &d16qItem{curr.loc, nil, curr.dir.TurnRight(), curr.cost + 1000})
+		heap.Push(&pq, &d16qItem{curr.loc, curr.dir.TurnLeft(), curr.cost + 1000})
+		heap.Push(&pq, &d16qItem{curr.loc, curr.dir.TurnRight(), curr.cost + 1000})
 	}
 	return dist
 }
