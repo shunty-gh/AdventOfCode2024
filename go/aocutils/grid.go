@@ -49,6 +49,14 @@ func (d Direction) TurnRight() Direction {
 	return Direction{-d.Y, d.X}
 }
 
+func (d Direction) TurnLeft() Direction {
+	return Direction{d.Y, -d.X}
+}
+
+func (d Direction) Reverse() Direction {
+	return Direction{-d.X, -d.Y}
+}
+
 func (p Point2d) RotateRight() Point2d {
 	return Point2d{-p.Y, p.X}
 }
