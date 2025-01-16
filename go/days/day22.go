@@ -6,6 +6,9 @@ import (
 	aoc "aoc2024/aocutils"
 	"strconv"
 	"strings"
+	"time"
+
+	"github.com/dolthub/swiss"
 )
 
 type day22 struct {
@@ -18,13 +21,14 @@ func Day22() {
 }
 
 func (d *day22) Run() {
+	defer aoc.TimeIt(time.Now(), "  Day 22")
 	input, err := aoc.GetDayInputLines(d.day)
 	aoc.CheckError(err)
 
 	// Create a counter that stores, for each sequence of 4 differences, the
 	// accumulated price for each set of secret numbers.
 	// For each set of secrets only record the first occurrence of the sequence.
-	seqcounter := aoc.NewCounter[[4]int]()
+	seqcounter := swiss.NewMap[[4]int, int](2000)
 	var part1 int64 = 0
 	for _, ln := range input {
 		num, _ := strconv.ParseInt(strings.TrimSpace(ln), 10, 64)
@@ -33,7 +37,14 @@ func (d *day22) Run() {
 
 	aoc.DayHeader(d.day)
 	aoc.PrintResult(1, part1)
-	aoc.PrintResult(2, seqcounter.MaxValue())
+	p2 := 0
+	seqcounter.Iter(func(k [4]int, v int) (stop bool) {
+		if v > p2 {
+			p2 = v
+		}
+		return false // continue - ie don't stop
+	})
+	aoc.PrintResult(2, p2)
 }
 
 func (d *day22) nextSecret(n int64) int64 {
@@ -52,9 +63,10 @@ func (d *day22) nextSecret(n int64) int64 {
 	return result
 }
 
-func (d *day22) getSequences(num int64, seqcounter *aoc.Counter[[4]int]) int64 {
+func (d *day22) getSequences(num int64, seqcounter *swiss.Map[[4]int, int]) int64 {
 	diffs := make([]int, 0, 2000)
-	seen := aoc.NewSet[[4]int]()
+	//seen := aoc.NewSet[[4]int]()
+	seen := swiss.NewMap[[4]int, struct{}](2000)
 	prev := 0
 	ns := num
 	for i := 1; i <= 2000; i++ {
@@ -70,9 +82,13 @@ func (d *day22) getSequences(num int64, seqcounter *aoc.Counter[[4]int]) int64 {
 			pd := [4]int(diffs[i-4:])
 			// Only add the first occurrence of this sequence. The monkey will only
 			// look for the first and then move on.
-			if !seen.Contains(pd) {
-				seen.Add(pd)
-				seqcounter.Inc(pd, price)
+			if !seen.Has(pd) {
+				seen.Put(pd, struct{}{})
+				if v, ok := seqcounter.Get(pd); ok {
+					seqcounter.Put(pd, v+price)
+				} else {
+					seqcounter.Put(pd, price)
+				}
 			}
 		}
 	}
