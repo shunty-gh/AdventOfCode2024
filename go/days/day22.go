@@ -6,7 +6,6 @@ import (
 	aoc "aoc2024/aocutils"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/dolthub/swiss"
 )
@@ -21,7 +20,6 @@ func Day22() {
 }
 
 func (d *day22) Run() {
-	defer aoc.TimeIt(time.Now(), "  Day 22")
 	input, err := aoc.GetDayInputLines(d.day)
 	aoc.CheckError(err)
 
