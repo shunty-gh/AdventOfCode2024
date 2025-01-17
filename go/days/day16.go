@@ -28,29 +28,9 @@ func (d *day16) Run() {
 	end, _ := grid.Find('E')
 
 	aoc.DayHeader(d.day)
-	part1, p1 := d.costsFromStart(grid, start, end)
+	part1, part2 := d.bestPaths(grid, start, end)
 	aoc.PrintResult(1, part1)
-	p2 := d.costsFromEnd(grid, end)
-
-	// For each possible point, if the cost from the start to the point
-	// plus the cost from the point to the end, equals our target (shortest) cost
-	// then the point must be on one of the best paths
-	bestset := aoc.NewSet[aoc.Point2d]()
-	for y := range d.yLen {
-		for x := range d.xLen {
-			for _, dir := range aoc.Directions4() {
-				pd := aoc.PointDirection{Loc: aoc.Point2d{X: x, Y: y}, Dir: dir}
-				if d1, ok := p1.TryGet(pd); ok {
-					if d2, ok := p2.TryGet(pd); ok {
-						if d1+d2 == part1 {
-							bestset.Add(pd.Loc)
-						}
-					}
-				}
-			}
-		}
-	}
-	aoc.PrintResult(2, bestset.Count())
+	aoc.PrintResult(2, part2)
 }
 
 type d16qItem struct {
@@ -60,10 +40,15 @@ type d16qItem struct {
 }
 
 // Get cheapest paths from start and the best total score from start to end
-func (d *day16) costsFromStart(grid *aoc.Grid2d[byte], start aoc.Point2d, target aoc.Point2d) (int, *aoc.Counter[aoc.PointDirection]) {
-	// Get the best score for each point from the start
+func (d *day16) bestPaths(grid *aoc.Grid2d[byte], start aoc.Point2d, target aoc.Point2d) (int, int) {
+	// Use Dijkstra's to get the best score for each point from the start
+	// When we find what we consider to be the best/better cost for a point, record
+	// how we got to that point in the `comeFrom` map - ie when we find a valid `next` point that we
+	// are about to put in the queue, record the `curr` value in comeFrom
+
 	dist := aoc.NewCounter[aoc.PointDirection]()
 	dist.Set(aoc.PointDirection{Loc: start, Dir: aoc.DirectionE}, 0)
+	comeFrom := make(map[aoc.PointDirection][]aoc.PointDirection)
 	best := 0
 
 	pq := make(PriorityQueue, 1)
@@ -87,48 +72,44 @@ func (d *day16) costsFromStart(grid *aoc.Grid2d[byte], start aoc.Point2d, target
 				if nxcost, ok := dist.TryGet(nxpd); !ok || newcost < nxcost {
 					dist.Set(nxpd, newcost)
 					heap.Push(&pq, &d16qItem{nx, dir, newcost})
+					// If it is better than the current best cost than clear out any
+					// existing comeFrom values for this point+dir and start a new list
+					comeFrom[nxpd] = []aoc.PointDirection{{Loc: curr.loc, Dir: curr.dir}}
+				} else if nxcost == newcost {
+					// If it is equal to the best cost for this point+dir then add it to
+					// the list of places to have come from
+					comeFrom[nxpd] = append(comeFrom[nxpd], aoc.PointDirection{Loc: curr.loc, Dir: curr.dir})
 				}
 			}
 		}
 	}
-	// Technically we don't need to store/return the best score as we can find it from
-	// the dist counter as the minimum of the NESW entries at the target point.
-	// But it makes life a bit neater.
-	return best, dist
-}
 
-// Get cheapest paths from end
-func (d *day16) costsFromEnd(grid *aoc.Grid2d[byte], target aoc.Point2d) *aoc.Counter[aoc.PointDirection] {
-	// Similar search but this time we're going in reverse from the end point
-	// in order to build a list of scores from each point to the end.
-	// We have to allow for the fact that each point can be reached by any neighbour from *any direction*
-	dist := aoc.NewCounter[aoc.PointDirection]()
-
-	pq := make(PriorityQueue, 4)
-	pq[0] = &d16qItem{target, aoc.DirectionN, 0}
-	pq[1] = &d16qItem{target, aoc.DirectionE, 0}
-	pq[2] = &d16qItem{target, aoc.DirectionS, 0}
-	pq[3] = &d16qItem{target, aoc.DirectionW, 0}
-	heap.Init(&pq)
-	for pq.Len() > 0 {
-		curr := heap.Pop(&pq).(*d16qItem)
-
-		cpd := aoc.PointDirection{Loc: curr.loc, Dir: curr.dir}
-		if d, ok := dist.TryGet(cpd); ok && curr.cost >= d {
-			continue
-		}
-		dist.Set(cpd, curr.cost)
-
-		// NB: Reverse direction as we're getting shortest paths *from the end*
-		nx := curr.loc.AddDir(curr.dir.Reverse())
-		if c, ok := grid.TryGet(nx); ok && c != d.wall {
-			heap.Push(&pq, &d16qItem{nx, curr.dir, curr.cost + 1})
-		}
-		// But left and right turns are still the same
-		heap.Push(&pq, &d16qItem{curr.loc, curr.dir.TurnLeft(), curr.cost + 1000})
-		heap.Push(&pq, &d16qItem{curr.loc, curr.dir.TurnRight(), curr.cost + 1000})
+	// Every entry in the comeFrom list will now take us via the cheapest path from
+	// the given point+dir back to the start.
+	// So now work our way back through the `comeFrom` list from the target/end
+	// point (via all possible directions) and create a set of all points appearing
+	// in any of those best paths.
+	q := []aoc.PointDirection{
+		{Loc: target, Dir: aoc.DirectionN},
+		{Loc: target, Dir: aoc.DirectionE},
+		{Loc: target, Dir: aoc.DirectionS},
+		{Loc: target, Dir: aoc.DirectionW},
 	}
-	return dist
+	bestpoints := aoc.NewSet[aoc.PointDirection]()
+	bestset := aoc.NewSet[aoc.Point2d]()
+	bestset.Add(target)
+	for len(q) > 0 {
+		curr := q[0]
+		q = q[1:]
+		for _, from := range comeFrom[curr] {
+			if !bestpoints.Contains(from) {
+				bestpoints.Add(from)
+				bestset.Add(from.Loc)
+				q = append(q, from)
+			}
+		}
+	}
+	return best, bestset.Count()
 }
 
 // A simple priority queue using a heap, as described on the Go docs
