@@ -63,7 +63,7 @@ type d16qItem struct {
 func (d *day16) costsFromStart(grid *aoc.Grid2d[byte], start aoc.Point2d, target aoc.Point2d) (int, *aoc.Counter[aoc.PointDirection]) {
 	// Get the best score for each point from the start
 	dist := aoc.NewCounter[aoc.PointDirection]()
-	seen := aoc.NewSet[aoc.PointDirection]()
+	dist.Set(aoc.PointDirection{Loc: start, Dir: aoc.DirectionE}, 0)
 	best := 0
 
 	pq := make(PriorityQueue, 1)
@@ -72,24 +72,24 @@ func (d *day16) costsFromStart(grid *aoc.Grid2d[byte], start aoc.Point2d, target
 	for pq.Len() > 0 {
 		curr := heap.Pop(&pq).(*d16qItem)
 
-		cpd := aoc.PointDirection{Loc: curr.loc, Dir: curr.dir}
-		if !dist.Contains(cpd) {
-			dist.Set(cpd, curr.cost)
-		}
 		if curr.loc == target && (best == 0 || curr.cost < best) {
 			best = curr.cost
 		}
-		if seen.Contains(cpd) {
-			continue
-		}
-		seen.Add(cpd)
 
-		nx := curr.loc.AddDir(curr.dir)
-		if c, ok := grid.TryGet(nx); ok && c != d.wall {
-			heap.Push(&pq, &d16qItem{nx, curr.dir, curr.cost + 1})
+		for _, dir := range []aoc.Direction{curr.dir, curr.dir.TurnLeft(), curr.dir.TurnRight()} {
+			nx := curr.loc.AddDir(dir)
+			if c, ok := grid.TryGet(nx); ok && c != d.wall {
+				nxpd := aoc.PointDirection{Loc: nx, Dir: dir}
+				newcost := curr.cost + 1
+				if dir != curr.dir {
+					newcost += 1000
+				}
+				if nxcost, ok := dist.TryGet(nxpd); !ok || newcost < nxcost {
+					dist.Set(nxpd, newcost)
+					heap.Push(&pq, &d16qItem{nx, dir, newcost})
+				}
+			}
 		}
-		heap.Push(&pq, &d16qItem{curr.loc, curr.dir.TurnLeft(), curr.cost + 1000})
-		heap.Push(&pq, &d16qItem{curr.loc, curr.dir.TurnRight(), curr.cost + 1000})
 	}
 	// Technically we don't need to store/return the best score as we can find it from
 	// the dist counter as the minimum of the NESW entries at the target point.
@@ -99,10 +99,10 @@ func (d *day16) costsFromStart(grid *aoc.Grid2d[byte], start aoc.Point2d, target
 
 // Get cheapest paths from end
 func (d *day16) costsFromEnd(grid *aoc.Grid2d[byte], target aoc.Point2d) *aoc.Counter[aoc.PointDirection] {
-	// Do the same search as before but this time we're going in reverse from the end point
-	// in order to build a list of scores from each point to the end
+	// Similar search but this time we're going in reverse from the end point
+	// in order to build a list of scores from each point to the end.
+	// We have to allow for the fact that each point can be reached by any neighbour from *any direction*
 	dist := aoc.NewCounter[aoc.PointDirection]()
-	seen := aoc.NewSet[aoc.PointDirection]()
 
 	pq := make(PriorityQueue, 4)
 	pq[0] = &d16qItem{target, aoc.DirectionN, 0}
@@ -114,13 +114,10 @@ func (d *day16) costsFromEnd(grid *aoc.Grid2d[byte], target aoc.Point2d) *aoc.Co
 		curr := heap.Pop(&pq).(*d16qItem)
 
 		cpd := aoc.PointDirection{Loc: curr.loc, Dir: curr.dir}
-		if !dist.Contains(cpd) {
-			dist.Set(cpd, curr.cost)
-		}
-		if seen.Contains(cpd) {
+		if d, ok := dist.TryGet(cpd); ok && curr.cost >= d {
 			continue
 		}
-		seen.Add(cpd)
+		dist.Set(cpd, curr.cost)
 
 		// NB: Reverse direction as we're getting shortest paths *from the end*
 		nx := curr.loc.AddDir(curr.dir.Reverse())
